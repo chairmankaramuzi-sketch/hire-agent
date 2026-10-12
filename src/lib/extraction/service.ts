@@ -1,12 +1,26 @@
 import { prisma } from '@/lib/prisma';
 import { logger } from '@/lib/logger';
 import { storageService } from '@/lib/storage';
-import { IExtractionProvider, MockExtractionProvider } from './provider';
+import { IExtractionProvider, MockExtractionProvider, GeminiExtractionProvider } from './provider';
 import { extractionOutputSchema } from './schema';
 import { ApplicationStatus, CriterionResult } from '@prisma/client';
+import { getEnv } from '@/lib/env';
 
 export class ExtractionService {
-  constructor(private provider: IExtractionProvider = new MockExtractionProvider()) {}
+  private provider: IExtractionProvider;
+
+  constructor(provider?: IExtractionProvider) {
+    if (provider) {
+      this.provider = provider;
+    } else {
+      const env = getEnv();
+      if (env.AI_API_KEY && env.AI_API_KEY.length > 5) {
+        this.provider = new GeminiExtractionProvider(env.AI_API_KEY);
+      } else {
+        this.provider = new MockExtractionProvider();
+      }
+    }
+  }
 
   async processApplication(applicationId: string, requestId?: string) {
     const application = await prisma.application.findUnique({
