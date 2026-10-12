@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  ADMIN
+  HR
+  APPLICANT
+}
+
+enum JobStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  PROCESSING
+  READY_FOR_REVIEW
+  NEEDS_MANUAL_REVIEW
+  SHORTLISTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum CriterionKind {
+  MANDATORY
+  WEIGHTED
+}
+
+enum CriterionResult {
+  MET
+  NOT_MET
+  UNKNOWN
+}
+
+enum DecisionKind {
+  SHORTLISTED
+  REJECTED
+  HOLD
+}
+
+model AppUser {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  displayName String   @map("display_name")
+  role        UserRole
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  createdJobs       Job[]               @relation("JobCreator")
+  createdCriteria   ScreeningCriteria[] @relation("CriteriaCreator")
+  applications      Application[]       @relation("ApplicantUser")
+  hrDecisions       HrDecision[]        @relation("DecidedBy")
+  reviewNotes       ReviewNote[]        @relation("NoteAuthor")
+  auditEvents       AuditEvent[]        @relation("AuditActor")
+
+  @@map("app_user")
+}
+
+model Job {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  department  String?
+  location    String?
+  status      JobStatus @default(DRAFT)
+  createdBy   String    @map("created_by")
+  publishedAt DateTime? @map("published_at")
+  closesAt    DateTime? @map("closes_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  creator      AppUser             @relation("JobCreator", fields: [createdBy], references: [id])
+  criteria     ScreeningCriteria[]
+  applications Application[]
+
+  @@map("job")
+}
+
+model ScreeningCriteria {
+  id            String        @id @default(uuid())
+  jobId         String        @map("job_id")
+  version       Int
+  name          String
+  description   String
+  kind          CriterionKind
+  weight        Decimal?      @db.Decimal(7, 4)
+  configuration Json          @default("{}")
+  active        Boolean       @default(true)
+  createdBy     String        @map("created_by")
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  job     Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  creator AppUser @relation("CriteriaCreator", fields: [createdBy], references: [id])
+
+  @@unique([jobId, version, name])
+  @@map("screening_criteria")
+}
+
+model Application {
+  id              String            @id @default(uuid())
+  jobId           String            @map("job_id")
+  applicantUserId String?           @map("applicant_user_id")
+  applicantName   String            @map("applicant_name")
+  applicantEmail  String            @map("applicant_email")
+  status          ApplicationStatus @default(SUBMITTED)
+  submittedAt     DateTime          @default(now()) @map("submitted_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  withdrawnAt     DateTime?         @map("withdrawn_at")
+
+  job           Job               @relation(fields: [jobId], references: [id])
+  applicantUser AppUser?          @relation("ApplicantUser", fields: [applicantUserId], references: [id])
+  cvAsset       CvAsset?
+  extractions   ExtractionRun[]
+  screenings    ScreeningResult[]
+  decisions     HrDecision[]
+  notes         ReviewNote[]
+
+  @@index([jobId, status, submittedAt(sort: Desc)])
+  @@index([jobId, applicantEmail])
+  @@map("application")
+}
+
+model CvAsset {
+  id               String   @id @default(uuid())
+  applicationId    String   @unique @map("application_id")
+  storageKey       String   @unique @map("storage_key")
+  originalFilename String   @map("original_filename")
+  detectedMimeType String   @map("detected_mime_type")
+  sizeBytes        BigInt   @map("size_bytes")
+  sha256Hex        String?  @map("sha256_hex") @db.Char(64)
+  scanStatus       String   @default("PENDING") @map("scan_status")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("cv_asset")
+}
+
+model ExtractionRun {
+  id             String    @id @default(uuid())
+  applicationId  String    @map("application_id")
+  status         String
+  provider       String?
+  modelName      String?   @map("model_name")
+  schemaVersion  Int       @map("schema_version")
+  safeErrorCode  String?   @map("safe_error_code")
+  startedAt      DateTime? @map("started_at")
+  completedAt    DateTime? @map("completed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  application Application         @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  evidence    ExtractedEvidence[]
+
+  @@index([applicationId, createdAt(sort: Desc)])
+  @@map("extraction_run")
+}
+
+model ExtractedEvidence {
+  id              String          @id @default(uuid())
+  extractionRunId String          @map("extraction_run_id")
+  fieldKey        String          @map("field_key")
+  normalizedValue Json?           @map("normalized_value")
+  evidenceText    String?         @map("evidence_text")
+  pageNumber      Int?            @map("page_number")
+  confidence      Decimal?        @db.Decimal(5, 4)
+  evidenceStatus  CriterionResult @default(UNKNOWN) @map("evidence_status")
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  extractionRun ExtractionRun @relation(fields: [extractionRunId], references: [id], onDelete: Cascade)
+
+  @@index([extractionRunId, fieldKey])
+  @@map("extracted_evidence")
+}
+
+model ScreeningResult {
+  id              String   @id @default(uuid())
+  applicationId   String   @map("application_id")
+  criteriaVersion Int      @map("criteria_version")
+  totalScore      Decimal? @map("total_score") @db.Decimal(8, 4)
+  maxScore        Decimal? @map("max_score") @db.Decimal(8, 4)
+  outcome         String
+  breakdown       Json
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@unique([applicationId, criteriaVersion])
+  @@map("screening_result")
+}
+
+model HrDecision {
+  id            String       @id @default(uuid())
+  applicationId String       @map("application_id")
+  decidedBy     String       @map("decided_by")
+  decision      DecisionKind
+  reason        String
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id])
+  decider     AppUser     @relation("DecidedBy", fields: [decidedBy], references: [id])
+
+  @@map("hr_decision")
+}
+
+model ReviewNote {
+  id            String   @id @default(uuid())
+  applicationId String   @map("application_id")
+  authorId      String   @map("author_id")
+  body          String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author      AppUser     @relation("NoteAuthor", fields: [authorId], references: [id])
+
+  @@map("review_note")
+}
+
+model AuditEvent {
+  id           String   @id @default(uuid())
+  actorUserId  String?  @map("actor_user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  requestId    String?  @map("request_id")
+  metadata     Json     @default("{}")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  actor AppUser? @relation("AuditActor", fields: [actorUserId], references: [id])
+
+  @@index([resourceType, resourceId, createdAt(sort: Desc)])
+  @@map("audit_event")
+}
