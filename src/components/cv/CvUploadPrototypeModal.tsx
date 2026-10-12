@@ -116,7 +116,7 @@ export function CvUploadPrototypeModal({
           <div>
             <h2 className="text-lg font-bold text-slate-900">Upload Applicant CVs</h2>
             <p className="text-xs text-slate-500">
-              Frontend prototype intake zone with client-side checks & simulated parsing.
+              Select or drop candidate CVs for parsing and screening.
             </p>
           </div>
           <button
@@ -125,15 +125,6 @@ export function CvUploadPrototypeModal({
           >
             <X className="w-5 h-5" />
           </button>
-        </div>
-
-        {/* Prototype boundary notice */}
-        <div className="px-5 py-2.5 bg-amber-50 border-b border-amber-200 flex items-center gap-2 text-xs text-amber-900">
-          <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
-          <span>
-            <strong>Frontend Prototype Mode:</strong> No actual CV content is transmitted externally.
-            Upload progress and parsing errors are simulated via mock services.
-          </span>
         </div>
 
         <div className="p-6 overflow-y-auto space-y-5 flex-1">

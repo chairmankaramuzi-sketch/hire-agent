@@ -46,7 +46,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-64 text-slate-500">
         <div className="animate-pulse flex items-center gap-2">
           <div className="w-4 h-4 rounded-full bg-slate-300"></div>
-          <span>Loading dashboard metrics from mock data services...</span>
+          <span>Loading dashboard metrics...</span>
         </div>
       </div>
     );

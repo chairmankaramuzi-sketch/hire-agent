@@ -78,8 +78,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {mockCurrentUser.name}
               </p>
               <div className="flex items-center gap-1">
-                <span className="text-[11px] text-slate-500">{mockCurrentUser.role} Role</span>
-                <span className="text-[10px] bg-slate-200 text-slate-700 px-1 rounded">Mock Auth</span>
+                <span className="text-[11px] text-slate-500">{mockCurrentUser.role}</span>
+                <span className="text-[10px] bg-indigo-50 text-indigo-700 px-1 rounded font-medium">Active</span>
               </div>
             </div>
           </div>
@@ -92,13 +92,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3 text-sm text-slate-500">
             <span className="font-medium text-slate-900">Enterprise HR Portal</span>
             <span>/</span>
-            <span>Fictional Demonstration Dataset</span>
+            <span>Recruitment & Hiring</span>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
               <UserCheck className="w-3.5 h-3.5" />
-              Mock Services Active
+              System Online
             </span>
           </div>
         </header>
