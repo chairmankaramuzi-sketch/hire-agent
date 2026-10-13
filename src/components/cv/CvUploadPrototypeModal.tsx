@@ -130,6 +130,7 @@ export function CvUploadPrototypeModal({
 
         const json = await res.json();
         const refreshed = await applicationsService.getApplications({ jobId });
+        setSelectedFiles([]);
         setResults({
           succeeded: refreshed.items,
           failedCount: 0,
@@ -166,6 +167,7 @@ export function CvUploadPrototypeModal({
 
       if (succeededApps.length > 0) {
         const refreshed = await applicationsService.getApplications({ jobId });
+        setSelectedFiles([]);
         setResults({
           succeeded: refreshed.items,
           failedCount: failCount,
@@ -205,6 +207,7 @@ export function CvUploadPrototypeModal({
       }
 
       const refreshed = await applicationsService.getApplications({ jobId });
+      setSelectedFiles([]);
       setResults({
         succeeded: refreshed.items,
         failedCount: 0,
@@ -354,14 +357,24 @@ export function CvUploadPrototypeModal({
 
           {/* Result Feedback Banner */}
           {results && (
-            <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 space-y-2 text-xs">
+            <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 space-y-2.5 text-xs">
               <div className="flex items-center gap-2 font-semibold text-emerald-900">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 Intake & AI Screening Pipeline Complete
               </div>
-              <p className="text-emerald-800">
+              <p className="text-emerald-800 leading-relaxed">
                 {results.message || `Processed ${results.succeeded.length} application records into the decision system.`}
               </p>
+              <div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-colors"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  View Screened Candidates
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -369,7 +382,7 @@ export function CvUploadPrototypeModal({
         {/* Modal Footer */}
         <div className="p-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
           <span className="text-xs text-slate-500">
-            {selectedFiles.filter((f) => f.isValid).length} valid documents selected
+            {results ? 'Screening complete' : `${selectedFiles.filter((f) => f.isValid).length} valid documents selected`}
           </span>
 
           <div className="flex items-center gap-3">
@@ -380,24 +393,35 @@ export function CvUploadPrototypeModal({
             >
               {results ? 'Close' : 'Cancel'}
             </button>
-            <button
-              type="button"
-              disabled={uploading || selectedFiles.filter((f) => f.isValid).length === 0}
-              onClick={handleSubmit}
-              className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
-            >
-              {uploading ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  Processing Documents...
-                </>
-              ) : (
-                <>
-                  <UploadCloud className="w-3.5 h-3.5" />
-                  Submit to Screening Engine
-                </>
-              )}
-            </button>
+            {results ? (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md shadow-sm transition-colors flex items-center gap-2"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                View Candidates
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={uploading || selectedFiles.filter((f) => f.isValid).length === 0}
+                onClick={handleSubmit}
+                className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {uploading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    Processing Documents...
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="w-3.5 h-3.5" />
+                    Submit to Screening Engine
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
