@@ -70,6 +70,15 @@ export async function GET(request: NextRequest) {
               },
             },
           },
+          notes: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+            include: {
+              author: {
+                select: { id: true, displayName: true, email: true },
+              },
+            },
+          },
           extractions: {
             where: { status: 'COMPLETED' },
             orderBy: { createdAt: 'desc' },
@@ -105,16 +114,22 @@ export async function GET(request: NextRequest) {
     if (queue && queue !== 'ALL') {
       if (queue === 'ELIGIBLE') {
         filteredApplications = applications.filter(
-          (a) => a.screenings[0]?.outcome === 'RECOMMENDED'
+          (a) =>
+            a.screenings[0]?.outcome === 'RECOMMENDED' ||
+            a.status === 'SHORTLISTED' ||
+            a.status === 'READY_FOR_REVIEW'
         );
       } else if (queue === 'INELIGIBLE') {
         filteredApplications = applications.filter(
-          (a) => a.screenings[0]?.outcome === 'NOT_RECOMMENDED'
+          (a) =>
+            a.screenings[0]?.outcome === 'NOT_RECOMMENDED' ||
+            a.status === 'REJECTED'
         );
       } else if (queue === 'NEEDS_REVIEW') {
         filteredApplications = applications.filter(
           (a) =>
             a.status === 'NEEDS_MANUAL_REVIEW' ||
+            a.screenings[0]?.outcome === 'NEEDS_MANUAL_REVIEW' ||
             a.screenings[0]?.outcome === 'NEEDS_REVIEW' ||
             !a.screenings[0]
         );

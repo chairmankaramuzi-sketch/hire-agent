@@ -15,6 +15,7 @@ export interface FactEvidenceInput {
   evidenceText?: string | null;
   confidence?: number | null;
   evidenceStatus?: CriterionResult;
+  scoreFactor?: number | null;
 }
 
 export interface CriterionResultDetail {
@@ -82,14 +83,28 @@ export function evaluateScreening(
       notes = 'No direct evidence found in extracted CV facts.';
     } else if (matchedEvidence.evidenceStatus === CriterionResult.MET) {
       status = CriterionResult.MET;
-      pointsAwarded = criterionMaxPoints;
-      notes = 'Evidence confirms requirement met.';
+      const factor = typeof matchedEvidence.scoreFactor === 'number'
+        ? Math.min(1.0, Math.max(0.05, matchedEvidence.scoreFactor))
+        : 1.0;
+      pointsAwarded = Number((criterionMaxPoints * factor).toFixed(1));
+      notes = factor < 1.0
+        ? `Evidence confirms requirement partially met (${Math.round(factor * 100)}% match).`
+        : 'Evidence confirms requirement fully met.';
     } else if (matchedEvidence.evidenceStatus === CriterionResult.NOT_MET) {
       status = CriterionResult.NOT_MET;
-      pointsAwarded = 0;
-      notes = 'Evidence indicates requirement was not met.';
+      const factor = typeof matchedEvidence.scoreFactor === 'number'
+        ? Math.min(0.35, Math.max(0.0, matchedEvidence.scoreFactor))
+        : 0;
+      pointsAwarded = Number((criterionMaxPoints * factor).toFixed(1));
+      notes = factor > 0
+        ? `Evidence indicates requirement was mostly not met (${Math.round(factor * 100)}% partial credit).`
+        : 'Evidence indicates requirement was not met.';
     } else {
       status = CriterionResult.UNKNOWN;
+      const factor = typeof matchedEvidence.scoreFactor === 'number'
+        ? Math.min(0.65, Math.max(0.2, matchedEvidence.scoreFactor))
+        : 0;
+      pointsAwarded = Number((criterionMaxPoints * factor).toFixed(1));
       notes = 'Evidence is ambiguous or requires HR human review.';
     }
 

@@ -65,9 +65,30 @@ export function mapPrismaApplicationToDomain(item: any): Application {
   else if (item.status === 'REJECTED') status = 'REJECTED_AFTER_REVIEW';
   else if (item.status === 'WITHDRAWN') status = 'WITHDRAWN';
 
-  const breakdownObj = latestScreening?.breakdown || {};
-  const mandatoryChecks = breakdownObj.mandatoryChecks || [];
-  const scoredCriteria = breakdownObj.scoredCriteria || [];
+  const rawBreakdown = latestScreening?.breakdown;
+  let mandatoryChecks: any[] = [];
+  let scoredCriteria: any[] = [];
+
+  if (Array.isArray(rawBreakdown)) {
+    mandatoryChecks = rawBreakdown
+      .filter((b: any) => b.kind === 'MANDATORY')
+      .map((b: any) => ({
+        name: b.criterionName,
+        status: b.status,
+        evidenceExcerpt: b.evidence || b.notes,
+      }));
+    scoredCriteria = rawBreakdown
+      .filter((b: any) => b.kind === 'WEIGHTED')
+      .map((b: any) => ({
+        name: b.criterionName,
+        pointsEarned: b.pointsAwarded ?? 0,
+        weight: b.maxPoints ?? b.weight ?? 0,
+        explanation: b.notes || (b.evidence ? `Evidence: ${b.evidence}` : 'Evaluated against job score profile'),
+      }));
+  } else if (rawBreakdown && typeof rawBreakdown === 'object') {
+    mandatoryChecks = rawBreakdown.mandatoryChecks || [];
+    scoredCriteria = rawBreakdown.scoredCriteria || [];
+  }
 
   const criterionResults = [
     ...mandatoryChecks.map((m: any, idx: number) => ({
@@ -190,15 +211,26 @@ export function mapPrismaApplicationToDomain(item: any): Application {
           createdAt: latestScreening.createdAt ? new Date(latestScreening.createdAt).toISOString() : new Date().toISOString(),
         }
       : undefined,
-    reviewDecisions: decisions.map((d: any) => ({
-      id: d.id,
-      applicationId: item.id,
-      reviewerId: d.decidedBy || d.decider?.id || 'usr-hr-001',
-      reviewerName: d.decider?.displayName || 'Jane Doe - HR Director',
-      decision: d.decision === 'SHORTLISTED' ? 'SHORTLIST' : d.decision === 'REJECTED' ? 'REJECT' : 'HOLD',
-      reason: d.reason,
-      createdAt: d.createdAt ? new Date(d.createdAt).toISOString() : new Date().toISOString(),
-    })),
+    reviewDecisions: [
+      ...decisions.map((d: any) => ({
+        id: d.id,
+        applicationId: item.id,
+        reviewerId: d.decidedBy || d.decider?.id || 'usr-hr-001',
+        reviewerName: d.decider?.displayName || 'Jane Doe - HR Director',
+        decision: (d.decision === 'SHORTLISTED' ? 'SHORTLIST' : d.decision === 'REJECTED' ? 'REJECT' : 'HOLD') as ReviewDecisionType,
+        reason: d.reason,
+        createdAt: d.createdAt ? new Date(d.createdAt).toISOString() : new Date().toISOString(),
+      })),
+      ...(item.notes ?? []).map((n: any) => ({
+        id: n.id,
+        applicationId: item.id,
+        reviewerId: n.authorId || n.author?.id || 'usr-hr-002',
+        reviewerName: n.author?.displayName || 'Marcus Sterling - Senior Technical Recruiter',
+        decision: 'HOLD' as ReviewDecisionType,
+        reason: `[Recruiter Audit] ${n.body}`,
+        createdAt: n.createdAt ? new Date(n.createdAt).toISOString() : new Date().toISOString(),
+      })),
+    ],
     createdAt: item.submittedAt ? new Date(item.submittedAt).toISOString() : new Date().toISOString(),
     updatedAt: item.updatedAt ? new Date(item.updatedAt).toISOString() : new Date().toISOString(),
   };
@@ -261,6 +293,22 @@ export const applicationsService = {
                   a.candidateProfile?.needsReview === true
               );
             }
+          }
+
+          if (filter?.sortBy) {
+            items.sort((a, b) => {
+              let cmp = 0;
+              if (filter.sortBy === 'score') {
+                const scoreA = a.screeningRun?.totalScore ?? -1;
+                const scoreB = b.screeningRun?.totalScore ?? -1;
+                cmp = scoreA - scoreB;
+              } else if (filter.sortBy === 'name') {
+                cmp = a.applicant.fullName.localeCompare(b.applicant.fullName);
+              } else {
+                cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+              }
+              return filter.sortOrder === 'asc' ? cmp : -cmp;
+            });
           }
 
           return {
