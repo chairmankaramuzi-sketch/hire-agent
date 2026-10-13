@@ -40,6 +40,7 @@ export function CvUploadPrototypeModal({
   const [selectedFiles, setSelectedFiles] = useState<FileUploadItem[]>([]);
   const [uploading, setUploading] = useState(false);
   const [batchIngesting, setBatchIngesting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [results, setResults] = useState<{
     succeeded: Application[];
     failedCount: number;
@@ -50,6 +51,7 @@ export function CvUploadPrototypeModal({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+    setErrorMessage(null);
     const newItems: FileUploadItem[] = Array.from(e.target.files).map((file) => {
       const isAcceptedFormat =
         file.name.endsWith('.pdf') ||
@@ -57,7 +59,9 @@ export function CvUploadPrototypeModal({
         file.name.endsWith('.txt') ||
         file.type === 'application/pdf' ||
         file.type === 'text/plain' ||
-        file.type.includes('word');
+        file.type.includes('word') ||
+        file.type.includes('officedocument') ||
+        !file.type; // Fallback if browser leaves type blank
 
       const isUnderSize = file.size <= 15 * 1024 * 1024; // 15MB limit
 
@@ -73,7 +77,7 @@ export function CvUploadPrototypeModal({
         file,
         name: file.name,
         size: file.size,
-        type: file.type,
+        type: file.type || 'text/plain',
         isValid: isAcceptedFormat && isUnderSize,
         validationError,
       };
@@ -86,19 +90,24 @@ export function CvUploadPrototypeModal({
     setSelectedFiles((prev) => prev.filter((f) => f.id !== id));
   };
 
-  // Upload selected files (checks if combined dossier or individual CVs)
+  // Upload selected files (supports combined dossier or individual CVs)
   const handleSubmit = async () => {
     const validOnes = selectedFiles.filter((f) => f.isValid);
     if (validOnes.length === 0) return;
 
     setUploading(true);
+    setErrorMessage(null);
+    setResults(null);
+
     try {
-      // Check if one of the files is the combined dossier
+      // 1. Check if any file is a text dossier or candidate batch document
       const dossierFile = validOnes.find(
         (f) =>
+          f.name.endsWith('.txt') ||
           f.name.toLowerCase().includes('dossier') ||
           f.name.toLowerCase().includes('combined') ||
-          f.name.toLowerCase().includes('30')
+          f.name.toLowerCase().includes('30') ||
+          f.name.toLowerCase().includes('candidate')
       );
 
       if (dossierFile) {
@@ -114,32 +123,60 @@ export function CvUploadPrototypeModal({
           body: formData,
         });
 
-        if (res.ok) {
-          const json = await res.json();
-          const refreshed = await applicationsService.getApplications({ jobId });
-          setResults({
-            succeeded: refreshed.items,
-            failedCount: 0,
-            message: `Combined Dossier parsed! Ingested and screened 30 candidates into this vacancy.`,
-          });
-          onUploadSuccess(refreshed.items);
-          return;
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `Failed to process document dossier (${res.status})`);
+        }
+
+        const json = await res.json();
+        const refreshed = await applicationsService.getApplications({ jobId });
+        setResults({
+          succeeded: refreshed.items,
+          failedCount: 0,
+          message:
+            json.data?.message ||
+            `Combined Dossier processed! Ingested and screened 30 candidates into this vacancy.`,
+        });
+        onUploadSuccess(refreshed.items);
+        return;
+      }
+
+      // 2. Individual CV files upload through live applications endpoint
+      const succeededApps: Application[] = [];
+      let failCount = 0;
+      let lastErrMsg = '';
+
+      for (let idx = 0; idx < validOnes.length; idx++) {
+        const f = validOnes[idx];
+        try {
+          const applicantName = f.name.replace(/\.[^/.]+$/, '').replace(/_/g, ' ');
+          const applicantEmail = `${applicantName.toLowerCase().replace(/[^a-z0-9]/g, '.').slice(0, 20)}.${Date.now()}.${idx}@applicant.io`;
+          const app = await applicationsService.uploadApplicationCv(
+            jobId,
+            f.file,
+            applicantName,
+            applicantEmail
+          );
+          succeededApps.push(app);
+        } catch (err: any) {
+          failCount++;
+          lastErrMsg = err.message || 'Processing failed';
         }
       }
 
-      // Standard batch upload
-      const res = await applicationsService.simulateBatchUpload(
-        jobId,
-        validOnes.map((f) => ({
-          fileName: f.name,
-          fileSize: f.size,
-          mimeType: f.type || 'application/pdf',
-          rawFile: f.file,
-        }))
-      );
-
-      setResults(res);
-      onUploadSuccess(res.succeeded);
+      if (succeededApps.length > 0) {
+        const refreshed = await applicationsService.getApplications({ jobId });
+        setResults({
+          succeeded: refreshed.items,
+          failedCount: failCount,
+          message: `Successfully uploaded and screened ${succeededApps.length} candidate CV${succeededApps.length > 1 ? 's' : ''}!${failCount > 0 ? ` (${failCount} failed: ${lastErrMsg})` : ''}`,
+        });
+        onUploadSuccess(refreshed.items);
+      } else if (failCount > 0) {
+        throw new Error(`Failed to upload ${failCount} CV(s): ${lastErrMsg}`);
+      }
+    } catch (err: any) {
+      setErrorMessage(err.message || 'An error occurred during CV intake.');
     } finally {
       setUploading(false);
     }
@@ -148,6 +185,9 @@ export function CvUploadPrototypeModal({
   // One-click combined batch ingestion
   const handleIngest30Batch = async () => {
     setBatchIngesting(true);
+    setErrorMessage(null);
+    setResults(null);
+
     try {
       const res = await fetch(`/api/v1/jobs/${jobId}/upload-dossier`, {
         method: 'POST',
@@ -159,15 +199,20 @@ export function CvUploadPrototypeModal({
         body: JSON.stringify({}),
       });
 
-      if (res.ok) {
-        const refreshed = await applicationsService.getApplications({ jobId });
-        setResults({
-          succeeded: refreshed.items,
-          failedCount: 0,
-          message: 'Ingested & screened all 30 realistic candidate CVs in one place!',
-        });
-        onUploadSuccess(refreshed.items);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || `Server error during batch ingestion (${res.status})`);
       }
+
+      const refreshed = await applicationsService.getApplications({ jobId });
+      setResults({
+        succeeded: refreshed.items,
+        failedCount: 0,
+        message: 'Ingested & screened all 30 realistic candidate CVs in one place!',
+      });
+      onUploadSuccess(refreshed.items);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to ingest batch candidates.');
     } finally {
       setBatchIngesting(false);
     }
@@ -293,6 +338,17 @@ export function CvUploadPrototypeModal({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Error Feedback Banner */}
+          {errorMessage && (
+            <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 space-y-1.5 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-rose-900">
+                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                Intake & Upload Error
+              </div>
+              <p className="text-rose-700 leading-relaxed">{errorMessage}</p>
             </div>
           )}
 

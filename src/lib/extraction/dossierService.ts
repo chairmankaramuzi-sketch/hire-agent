@@ -1,14 +1,12 @@
 import { prisma } from '@/lib/prisma';
-import { storageService } from '@/lib/storage';
-import { screeningService } from '@/lib/screening/service';
 import { sample30Candidates, SampleCandidate } from '@/lib/data/sampleCandidates';
-import { ApplicationStatus, CriterionResult, UserRole } from '@prisma/client';
 import { recordAuditEvent } from '@/lib/audit';
-import { logger } from '@/lib/logger';
+import { ingestCandidates } from '@/lib/system/systemAdmin';
 
 export class DossierService {
   /**
-   * Ingests and screens the entire batch of 30 realistic candidates for a job.
+   * Ingests and screens the entire batch of realistic candidates for a job.
+   * Uses high-speed bulk ingestion with granular score profiles and status distribution.
    */
   async ingestCandidateBatch(
     jobId: string,
@@ -25,168 +23,7 @@ export class DossierService {
       throw new Error(`Job ${jobId} not found`);
     }
 
-    const createdApplications = [];
-
-    for (let i = 0; i < candidates.length; i++) {
-      const c = candidates[i];
-      const normalizedEmail = c.email.toLowerCase().trim();
-
-      // Check if application already exists for this job & email
-      let application = await prisma.application.findFirst({
-        where: { jobId, applicantEmail: normalizedEmail },
-      });
-
-      if (!application) {
-        application = await prisma.application.create({
-          data: {
-            jobId,
-            applicantName: c.name,
-            applicantEmail: normalizedEmail,
-            status: ApplicationStatus.PROCESSING,
-          },
-        });
-      }
-
-      // Generate individual CV text content
-      const cvText = `================================================================================
-CV / RESUME: ${c.name.toUpperCase()}
-================================================================================
-Target Role: ${job.title}
-Email: ${c.email} | Phone: ${c.phone} | Location: ${c.location}
-Years of Commercial Experience: ${c.yearsExperience} years
-Highest Degree: ${c.degree} (${c.degreeField})
-
-SUMMARY:
-${c.summary}
-
-CORE SKILLS:
-${c.skills.join(', ')}
-
-EXPERIENCE:
-${c.workHistory.map(w => `* ${w.role} at ${w.company} (${w.period})\n  ${w.description}`).join('\n\n')}
-
-EDUCATION:
-* ${c.degree} - Accredited Institution (${c.degreeField})
-`;
-
-      const cvBuffer = Buffer.from(cvText, 'utf-8');
-      const filename = `${c.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}_cv.txt`;
-      const storageKey = `cvs/${application.id}-${filename}`;
-
-      await storageService.uploadFile({
-        filename,
-        mimeType: 'text/plain',
-        buffer: cvBuffer,
-      });
-
-      // Save/Upsert CvAsset
-      await prisma.cvAsset.upsert({
-        where: { applicationId: application.id },
-        update: {
-          storageKey,
-          originalFilename: filename,
-          detectedMimeType: 'text/plain',
-          sizeBytes: BigInt(cvBuffer.length),
-          scanStatus: 'CLEAN',
-        },
-        create: {
-          applicationId: application.id,
-          storageKey,
-          originalFilename: filename,
-          detectedMimeType: 'text/plain',
-          sizeBytes: BigInt(cvBuffer.length),
-          scanStatus: 'CLEAN',
-        },
-      });
-
-      // Create Extraction Run
-      const extractionRun = await prisma.extractionRun.create({
-        data: {
-          applicationId: application.id,
-          status: 'COMPLETED',
-          provider: 'dossier-ai-parser',
-          schemaVersion: 1,
-          startedAt: new Date(),
-          completedAt: new Date(),
-        },
-      });
-
-      // Map evidence tailored to job criteria
-      // 1. Degree evidence
-      await prisma.extractedEvidence.create({
-        data: {
-          extractionRunId: extractionRun.id,
-          fieldKey: 'degree',
-          normalizedValue: c.degree,
-          evidenceText: `Candidate attained ${c.degree} in ${c.degreeField}.`,
-          pageNumber: 1,
-          confidence: 0.96,
-          evidenceStatus: c.isCsDegree ? CriterionResult.MET : CriterionResult.NOT_MET,
-        },
-      });
-
-      // 2. Experience years evidence
-      await prisma.extractedEvidence.create({
-        data: {
-          extractionRunId: extractionRun.id,
-          fieldKey: 'experience_years',
-          normalizedValue: c.yearsExperience,
-          evidenceText: `Verified ${c.yearsExperience} years of production commercial software experience across listed roles.`,
-          pageNumber: 1,
-          confidence: 0.95,
-          evidenceStatus:
-            c.yearsExperience >= 3.0
-              ? CriterionResult.MET
-              : c.yearsExperience >= 2.5
-              ? CriterionResult.UNKNOWN
-              : CriterionResult.NOT_MET,
-        },
-      });
-
-      // 3. Modern Web Stack (TypeScript, React, Node.js)
-      const hasModernStack =
-        c.skills.includes('TypeScript') && (c.skills.includes('React') || c.skills.includes('Node.js'));
-      await prisma.extractedEvidence.create({
-        data: {
-          extractionRunId: extractionRun.id,
-          fieldKey: 'web_stack',
-          normalizedValue: c.skills,
-          evidenceText: `Technical proficiency in: ${c.skills.join(', ')}.`,
-          pageNumber: 1,
-          confidence: 0.92,
-          evidenceStatus: hasModernStack ? CriterionResult.MET : CriterionResult.NOT_MET,
-        },
-      });
-
-      // 4. Testing & Code Quality
-      const hasTesting = c.skills.some(
-        s => s.toLowerCase().includes('vitest') || s.toLowerCase().includes('jest') || s.toLowerCase().includes('testing')
-      );
-      await prisma.extractedEvidence.create({
-        data: {
-          extractionRunId: extractionRun.id,
-          fieldKey: 'testing_quality',
-          normalizedValue: hasTesting ? 'Automated Testing' : 'No explicit testing framework',
-          evidenceText: hasTesting
-            ? `Demonstrated testing experience with ${c.skills.filter(s => s.includes('test') || s === 'Jest' || s === 'Vitest').join(', ')}.`
-            : 'No automated testing framework mentioned in CV.',
-          pageNumber: 1,
-          confidence: 0.9,
-          evidenceStatus: hasTesting ? CriterionResult.MET : CriterionResult.NOT_MET,
-        },
-      });
-
-      // Run Deterministic Screening
-      try {
-        await screeningService.runScreening(application.id, requestId);
-      } catch (err) {
-        logger.error('Failed to run deterministic screening during batch ingestion', err, {
-          applicationId: application.id,
-        });
-      }
-
-      createdApplications.push(application);
-    }
+    const batch = await ingestCandidates(jobId, candidates);
 
     await recordAuditEvent({
       actorUserId,
@@ -194,12 +31,15 @@ EDUCATION:
       resourceType: 'JOB',
       resourceId: jobId,
       requestId,
-      metadata: { totalCandidates: candidates.length },
+      metadata: { totalCandidates: batch.total, outcomes: batch.outcomes, statuses: batch.statuses },
     });
 
     return {
-      total: candidates.length,
-      applications: createdApplications,
+      total: batch.total,
+      jobId: batch.jobId,
+      jobTitle: batch.jobTitle,
+      outcomes: batch.outcomes,
+      statuses: batch.statuses,
     };
   }
 

@@ -64,14 +64,42 @@ export function evaluateScreening(
     evidenceMap.set(ev.fieldKey.toLowerCase(), ev);
   }
 
+  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
+
   for (const criterion of criteria) {
     const key = criterion.name.toLowerCase();
-    // Match evidence by fieldKey, substring, or configuration field
+    const keyNorm = normalize(criterion.name);
+
+    // Match evidence by fieldKey, substring, token overlap, or semantic category
     const matchedEvidence =
       evidenceMap.get(key) ||
-      Array.from(evidenceMap.values()).find(
-        e => e.fieldKey.toLowerCase().includes(key) || key.includes(e.fieldKey.toLowerCase())
-      );
+      evidenceMap.get(keyNorm) ||
+      Array.from(evidenceMap.values()).find(e => {
+        const evKeyNorm = normalize(e.fieldKey);
+        if (evKeyNorm === keyNorm) return true;
+        if (keyNorm.includes(evKeyNorm) || evKeyNorm.includes(keyNorm)) return true;
+        // Degree / Education
+        if (
+          (keyNorm.includes('degree') || keyNorm.includes('education')) &&
+          (evKeyNorm.includes('degree') || evKeyNorm.includes('education'))
+        ) return true;
+        // Experience / Tenure
+        if (
+          (keyNorm.includes('experience') || keyNorm.includes('year') || keyNorm.includes('tenure')) &&
+          (evKeyNorm.includes('experience') || evKeyNorm.includes('year') || evKeyNorm.includes('tenure'))
+        ) return true;
+        // Web Stack / TypeScript / React / Node
+        if (
+          (keyNorm.includes('stack') || keyNorm.includes('typescript') || keyNorm.includes('react') || keyNorm.includes('web')) &&
+          (evKeyNorm.includes('stack') || evKeyNorm.includes('web') || evKeyNorm.includes('skill') || evKeyNorm.includes('typescript') || evKeyNorm.includes('react'))
+        ) return true;
+        // Testing / Database / Quality / Postgres
+        if (
+          (keyNorm.includes('test') || keyNorm.includes('database') || keyNorm.includes('quality') || keyNorm.includes('sql') || keyNorm.includes('postgres')) &&
+          (evKeyNorm.includes('test') || evKeyNorm.includes('database') || evKeyNorm.includes('quality') || evKeyNorm.includes('sql') || evKeyNorm.includes('postgres'))
+        ) return true;
+        return false;
+      });
 
     let status: CriterionResult = CriterionResult.UNKNOWN;
     let pointsAwarded = 0;

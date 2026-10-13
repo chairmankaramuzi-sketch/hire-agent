@@ -29,7 +29,17 @@ export function validateCvFile(file: { name: string; type: string; size: number 
     return { valid: false, error: `Invalid file extension. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}` };
   }
 
-  if (!ALLOWED_MIME_TYPES.includes(file.type) && file.type !== 'application/octet-stream') {
+  // Some browsers and operating systems supply generic, empty, or platform-specific MIME types
+  const isAllowedMime =
+    !file.type ||
+    file.type === 'application/octet-stream' ||
+    ALLOWED_MIME_TYPES.includes(file.type) ||
+    file.type.startsWith('text/') ||
+    file.type.includes('word') ||
+    file.type.includes('officedocument') ||
+    file.type.includes('pdf');
+
+  if (!isAllowedMime) {
     return { valid: false, error: 'Invalid file MIME type. Only PDF, DOCX, DOC, or TXT allowed' };
   }
 

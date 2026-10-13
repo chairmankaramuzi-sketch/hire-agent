@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { apiSuccess, apiError, generateRequestId } from '@/lib/apiResponse';
 import { dossierService } from '@/lib/extraction/dossierService';
+import { ingestCandidates } from '@/lib/system/systemAdmin';
 
 export async function POST(
   request: NextRequest,
@@ -24,31 +25,30 @@ export async function POST(
   const contentType = request.headers.get('content-type') || '';
   if (contentType.includes('multipart/form-data')) {
     const formData = await request.formData();
-    const file = formData.get('dossier') as File | null;
+    const file = (formData.get('dossier') ||
+      formData.get('file') ||
+      formData.get('cv') ||
+      formData.get('document')) as File | null;
     if (file) {
-      const text = await file.text();
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const text = buffer.toString('utf-8');
       candidatesToIngest = dossierService.parseCombinedDossierText(text);
     }
   } else if (contentType.includes('application/json')) {
     const body = await request.json().catch(() => ({}));
-    if (body.rawText) {
+    if (body?.rawText) {
       candidatesToIngest = dossierService.parseCombinedDossierText(body.rawText);
     }
   }
 
-  const actorUserId = session?.userId || 'usr-hr-001';
-
-  const result = await dossierService.ingestCandidateBatch(
-    params.jobId,
-    candidatesToIngest,
-    actorUserId,
-    requestId
-  );
+  const result = await ingestCandidates(params.jobId, candidatesToIngest);
 
   return apiSuccess(
     {
-      message: `Successfully ingested and screened ${result.total} candidates from combined dossier`,
+      message: `Successfully ingested and screened ${result.total} candidates into "${result.jobTitle}"`,
       count: result.total,
+      outcomes: result.outcomes,
+      statuses: result.statuses,
     },
     undefined,
     requestId
