@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_APP_URL: z.string().default('http://localhost:3000'),
   DATABASE_URL: z.string().min(1).default('postgresql://user:password@localhost:5432/hr_agent?schema=public'),
   DIRECT_URL: z.string().optional(),
   STORAGE_BUCKET_NAME: z.string().default('cv-documents'),

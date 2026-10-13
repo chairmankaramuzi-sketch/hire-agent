@@ -13,7 +13,13 @@ function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     return '';
   }
-  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return 'http://localhost:3000';
 }
 
 // In-memory clone to simulate persistence during tests or offline mode
