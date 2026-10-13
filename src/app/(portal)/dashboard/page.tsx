@@ -19,8 +19,14 @@ import {
   ShieldAlert,
   RefreshCw,
   FileText,
+  UserCog,
+  Eye,
+  EyeOff,
+  Database,
 } from 'lucide-react';
 import { applicationsService, jobsService, systemService } from '@/services';
+import type { SystemCounts } from '@/services/system';
+import { staffAccounts, APPLICANT_SEED_PASSWORD } from '@/lib/data/staffAccounts';
 import { DashboardMetrics, Job, Application } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 
@@ -31,13 +37,26 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   // Danger zone state
-  const [dangerLoading, setDangerLoading] = useState<string | null>(null);
+  type DangerAction = 'reset' | 'purge-apps' | 'purge-jobs' | 'seed-batch' | 'seed-users';
+  const [dangerLoading, setDangerLoading] = useState<DangerAction | null>(null);
   const [dangerFeedback, setDangerFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [systemCounts, setSystemCounts] = useState<SystemCounts | null>(null);
+  const [confirmText, setConfirmText] = useState('');
+  const [showPasswords, setShowPasswords] = useState(false);
   const [confirmModal, setConfirmModal] = useState<{
-    action: 'reset' | 'purge-apps' | 'purge-jobs';
+    action: Exclude<DangerAction, 'seed-batch' | 'seed-users'>;
     title: string;
     description: string;
+    keyword: string;
   } | null>(null);
+
+  const loadCounts = React.useCallback(async () => {
+    try {
+      setSystemCounts(await systemService.getStatus());
+    } catch {
+      setSystemCounts(null);
+    }
+  }, []);
 
   const loadData = React.useCallback(async () => {
     try {
@@ -52,35 +71,34 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+    loadCounts();
+  }, [loadCounts]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
-  const handleAction = async (action: 'reset' | 'purge-apps' | 'purge-jobs' | 'seed-batch') => {
+  const handleAction = async (action: DangerAction) => {
     setDangerLoading(action);
     setDangerFeedback(null);
     try {
-      if (action === 'reset') {
-        const res = await systemService.resetSystem();
-        setDangerFeedback({ type: 'success', message: res.message });
-      } else if (action === 'purge-apps') {
-        const res = await systemService.purgeApplications();
-        setDangerFeedback({ type: 'success', message: res.message });
-      } else if (action === 'purge-jobs') {
-        const res = await systemService.purgeJobs();
-        setDangerFeedback({ type: 'success', message: res.message });
-      } else if (action === 'seed-batch') {
-        const res = await systemService.seedCandidateBatch();
-        setDangerFeedback({ type: 'success', message: res.message });
-      }
+      const run = {
+        reset: () => systemService.resetSystem(),
+        'purge-apps': () => systemService.purgeApplications(),
+        'purge-jobs': () => systemService.purgeJobs(),
+        'seed-batch': () => systemService.seedCandidateBatch(),
+        'seed-users': () => systemService.seedUsers(),
+      }[action];
+      const res = await run();
+      const seconds = (res.durationMs / 1000).toFixed(1);
+      setDangerFeedback({ type: 'success', message: `${res.message} (${seconds}s)` });
       await loadData();
     } catch (err: any) {
       setDangerFeedback({ type: 'error', message: err?.message || 'Operation failed' });
     } finally {
       setDangerLoading(null);
       setConfirmModal(null);
+      setConfirmText('');
     }
   };
 
@@ -324,22 +342,58 @@ export default function DashboardPage() {
             <div>
               <h2 className="text-base font-bold text-slate-900">System Testing & Danger Zone</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Initialise the environment, run automated candidate testing batches, or purge test records.
+                Initialise the environment, test with 30 real CVs, reset test data, or restore test user credentials.
               </p>
             </div>
           </div>
 
-          <a
-            href="/sample_docs/Combined_30_Candidates_Dossier.txt"
-            download="Combined_30_Candidates_Dossier.txt"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 shadow-sm transition-colors self-start sm:self-auto"
-          >
-            <Download className="w-4 h-4 text-slate-500" />
-            Download Master 30-CV Dossier (.txt)
-          </a>
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            <button
+              type="button"
+              onClick={loadCounts}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 shadow-sm transition-colors"
+              title="Refresh database counts"
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-slate-500" />
+              Refresh Counts
+            </button>
+            <a
+              href="/sample_docs/Combined_30_Candidates_Dossier.txt"
+              download="Combined_30_Candidates_Dossier.txt"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 shadow-sm transition-colors"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              Master 30-CV Dossier (.txt)
+            </a>
+          </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Live Database Counts Bar */}
+        {systemCounts && (
+          <div className="px-5 py-3 bg-slate-50/80 border-b border-slate-100 flex items-center gap-4 text-xs text-slate-600 flex-wrap">
+            <span className="font-semibold text-slate-700 flex items-center gap-1.5">
+              <Database className="w-3.5 h-3.5 text-indigo-600" />
+              Live DB State:
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white border border-slate-200">
+              <strong className="text-slate-900">{systemCounts.users}</strong> Users ({systemCounts.staff} Staff)
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white border border-slate-200">
+              <strong className="text-slate-900">{systemCounts.jobs}</strong> Vacancies
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white border border-slate-200">
+              <strong className="text-slate-900">{systemCounts.applications}</strong> Applications
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white border border-slate-200">
+              <strong className="text-slate-900">{systemCounts.cvAssets}</strong> CV Files
+            </span>
+            <span className="px-2 py-0.5 rounded bg-white border border-slate-200">
+              <strong className="text-slate-900">{systemCounts.screenings}</strong> Screenings
+            </span>
+          </div>
+        )}
+
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Action 1: Load 30 Candidates Batch */}
           <div className="p-4 rounded-lg border border-indigo-100 bg-indigo-50/30 flex flex-col justify-between space-y-3">
             <div>
@@ -361,23 +415,55 @@ export default function DashboardPage() {
               {dangerLoading === 'seed-batch' ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  Processing 30 CVs...
+                  Processing...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5" />
-                  Load & Screen 30 Candidates
+                  Load 30 Candidates
                 </>
               )}
             </button>
           </div>
 
-          {/* Action 2: Purge Applications */}
+          {/* Action 2: Restore Seed Users */}
+          <div className="p-4 rounded-lg border border-emerald-200 bg-emerald-50/30 flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center gap-2 font-bold text-xs text-emerald-950">
+                <UserCog className="w-4 h-4 text-emerald-600" />
+                Restore Test Users
+              </div>
+              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                Restores the 5 staff logins (Jane Doe, Admin, etc.) and applicant credentials with verified passwords without wiping jobs.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              disabled={dangerLoading !== null}
+              onClick={() => handleAction('seed-users')}
+              className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300 transition-all disabled:opacity-50"
+            >
+              {dangerLoading === 'seed-users' ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Restoring...
+                </>
+              ) : (
+                <>
+                  <UserCog className="w-3.5 h-3.5" />
+                  Restore Users
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Action 3: Purge Applications */}
           <div className="p-4 rounded-lg border border-amber-200 bg-amber-50/30 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center gap-2 font-bold text-xs text-amber-900">
                 <Trash2 className="w-4 h-4 text-amber-600" />
-                Remove All CVs & Applications
+                Remove All CVs & Apps
               </div>
               <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                 Wipes all candidates, uploaded CV files, extractions, and scores. Preserves job vacancies and criteria.
@@ -393,6 +479,7 @@ export default function DashboardPage() {
                   title: 'Purge All Applications & CVs?',
                   description:
                     'This will permanently delete all candidate profiles, CV documents, and AI screening runs. Job vacancies will remain intact.',
+                  keyword: 'PURGE',
                 })
               }
               className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-amber-800 bg-amber-100 hover:bg-amber-200 border border-amber-300 transition-all disabled:opacity-50"
@@ -402,7 +489,7 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Action 3: Reset Entire System */}
+          {/* Action 4: Reset Entire System */}
           <div className="p-4 rounded-lg border border-rose-200 bg-rose-50/30 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center gap-2 font-bold text-xs text-rose-900">
@@ -410,7 +497,7 @@ export default function DashboardPage() {
                 Reset System to Baseline
               </div>
               <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-                Clears all data and reinitialises the default vacancies (Senior Full-Stack, Product Manager) and baseline criteria.
+                Full factory reset: clears all data and reinitialises default vacancies, criteria, and staff accounts.
               </p>
             </div>
 
@@ -422,7 +509,8 @@ export default function DashboardPage() {
                   action: 'reset',
                   title: 'Reset Entire System to Baseline?',
                   description:
-                    'This will reset all vacancies, criteria, candidates, and CV files back to a pristine initial state with default demo roles.',
+                    'This will wipe all candidate applications and custom vacancies, then re-seed default demo vacancies, criteria, and staff accounts.',
+                  keyword: 'RESET',
                 })
               }
               className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-rose-800 bg-rose-100 hover:bg-rose-200 border border-rose-300 transition-all disabled:opacity-50"
@@ -432,7 +520,7 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Action 4: Remove Vacancies */}
+          {/* Action 5: Remove Vacancies */}
           <div className="p-4 rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col justify-between space-y-3">
             <div>
               <div className="flex items-center gap-2 font-bold text-xs text-slate-800">
@@ -452,7 +540,8 @@ export default function DashboardPage() {
                   action: 'purge-jobs',
                   title: 'Remove All Vacancies?',
                   description:
-                    'This will delete all job definitions, their associated criteria, and candidate applications.',
+                    'This will delete all job definitions, their associated criteria, and candidate applications attached to them.',
+                  keyword: 'JOBS',
                 })
               }
               className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-300 transition-all disabled:opacity-50"
@@ -460,6 +549,52 @@ export default function DashboardPage() {
               <Trash2 className="w-3.5 h-3.5" />
               Clear Vacancies
             </button>
+          </div>
+        </div>
+
+        {/* Test Accounts & Credentials Accordion */}
+        <div className="px-6 py-4 bg-slate-50/60 border-t border-slate-100">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <UserCog className="w-4 h-4 text-slate-500" />
+              <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                Active Staff Test Accounts
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPasswords(!showPasswords)}
+              className="inline-flex items-center gap-1.5 text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+            >
+              {showPasswords ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {showPasswords ? 'Hide Passwords' : 'Show Passwords'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {staffAccounts.map((account) => (
+              <div
+                key={account.id}
+                className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs flex flex-col justify-between shadow-2xs"
+              >
+                <div>
+                  <div className="font-semibold text-slate-900 flex items-center justify-between">
+                    <span>{account.displayName}</span>
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-slate-100 text-slate-600">
+                      {account.role}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-500 mt-0.5">{account.email}</div>
+                  <div className="text-[11px] text-slate-400">Username: <span className="font-mono text-slate-600">{account.username}</span></div>
+                </div>
+                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">Password:</span>
+                  <span className="font-mono font-semibold text-indigo-700">
+                    {showPasswords ? account.password : '••••••••••••'}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -480,20 +615,36 @@ export default function DashboardPage() {
 
             <p className="text-xs text-slate-600 leading-relaxed">{confirmModal.description}</p>
 
+            <div className="space-y-1.5 bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+              <label className="text-[11px] font-semibold text-rose-900">
+                Type <span className="font-mono bg-rose-200/70 px-1 py-0.5 rounded">{confirmModal.keyword}</span> to confirm:
+              </label>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => setConfirmText(e.target.value)}
+                placeholder={confirmModal.keyword}
+                className="w-full px-3 py-1.5 text-xs font-mono uppercase bg-white border border-rose-300 rounded-md focus:ring-2 focus:ring-rose-500 focus:outline-none"
+              />
+            </div>
+
             <div className="pt-2 flex items-center justify-end gap-3">
               <button
                 type="button"
                 disabled={dangerLoading !== null}
-                onClick={() => setConfirmModal(null)}
+                onClick={() => {
+                  setConfirmModal(null);
+                  setConfirmText('');
+                }}
                 className="px-4 py-2 rounded-lg text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50"
               >
                 Cancel
               </button>
               <button
                 type="button"
-                disabled={dangerLoading !== null}
+                disabled={dangerLoading !== null || confirmText.trim().toUpperCase() !== confirmModal.keyword}
                 onClick={() => handleAction(confirmModal.action)}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 shadow-sm flex items-center gap-2 disabled:opacity-40"
               >
                 {dangerLoading ? (
                   <>

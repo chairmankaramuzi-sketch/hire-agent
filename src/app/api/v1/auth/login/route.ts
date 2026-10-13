@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { apiSuccess, apiError, generateRequestId } from '@/lib/apiResponse';
 import { SESSION_COOKIE_NAME, serializeSession, AuthSession } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
+import { verifyPassword } from '@/lib/password';
 
 export async function POST(request: NextRequest) {
   const requestId = request.headers.get('x-request-id') ?? generateRequestId();
@@ -21,57 +22,35 @@ export async function POST(request: NextRequest) {
     return apiError('MISSING_CREDENTIALS', 'Email or username is required', 400, requestId);
   }
 
-  if (!password || password.length < 3) {
-    return apiError('INVALID_PASSWORD', 'Password is required and must be at least 3 characters', 400, requestId);
+  if (!password) {
+    return apiError('INVALID_PASSWORD', 'Password is required', 400, requestId);
   }
 
-  // Find user in database or demo defaults
-  let matchedUser = await prisma.appUser.findFirst({
+  // Look up by email or username
+  const matchedUser = await prisma.appUser.findFirst({
     where: {
-      email: { equals: rawUsername, mode: 'insensitive' },
+      OR: [
+        { email: { equals: rawUsername, mode: 'insensitive' } },
+        { username: { equals: rawUsername, mode: 'insensitive' } },
+      ],
     },
   });
 
-  // If not found by exact email, allow standard login aliases
-  if (!matchedUser) {
-    if (rawUsername.includes('admin')) {
-      matchedUser = await prisma.appUser.findUnique({ where: { id: 'usr-admin-001' } });
-      if (!matchedUser) {
-        matchedUser = await prisma.appUser.upsert({
-          where: { email: 'admin@company.com' },
-          update: {},
-          create: {
-            id: 'usr-admin-001',
-            email: 'admin@company.com',
-            displayName: 'System Admin',
-            role: UserRole.ADMIN,
-          },
-        });
-      }
-    } else if (rawUsername.includes('hr') || rawUsername.includes('jane')) {
-      matchedUser = await prisma.appUser.findUnique({ where: { id: 'usr-hr-001' } });
-      if (!matchedUser) {
-        matchedUser = await prisma.appUser.upsert({
-          where: { email: 'hr@company.com' },
-          update: {},
-          create: {
-            id: 'usr-hr-001',
-            email: 'hr@company.com',
-            displayName: 'Jane Doe - HR Director',
-            role: UserRole.HR,
-          },
-        });
-      }
-    }
-  }
+  const passwordOk = await verifyPassword(password, matchedUser?.passwordHash);
 
-  if (!matchedUser) {
+  if (!matchedUser || !passwordOk) {
     return apiError(
       'INVALID_CREDENTIALS',
-      'Invalid username or password. Use hr@company.com or admin@company.com',
+      matchedUser && !matchedUser.passwordHash
+        ? 'This account has no password set. Run "npm run db:seed" to restore the seeded test users.'
+        : 'Invalid username or password.',
       401,
       requestId
     );
+  }
+
+  if (matchedUser.role === UserRole.APPLICANT) {
+    return apiError('FORBIDDEN', 'Applicant accounts do not have access to the HR portal.', 403, requestId);
   }
 
   const session: AuthSession = {

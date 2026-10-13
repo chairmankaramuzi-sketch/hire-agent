@@ -15,11 +15,13 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { authService } from '@/services/auth';
+import { staffAccounts } from '@/lib/data/staffAccounts';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('hr@company.com');
-  const [password, setPassword] = useState('password123');
+  const defaultStaff = staffAccounts[1]; // Jane Doe - HR Director
+  const [username, setUsername] = useState(defaultStaff?.email ?? 'hr@company.com');
+  const [password, setPassword] = useState(defaultStaff?.password ?? 'HrDirector@2026');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,35 +167,39 @@ export default function LoginPage() {
 
           {/* Quick Demo Credentials */}
           <div className="mt-8 pt-6 border-t border-slate-700/60">
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-              <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Quick Test Credentials</span>
+            <div className="flex items-center justify-between text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+              <div className="flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Quick Test Credentials</span>
+              </div>
+              <span className="text-[10px] text-slate-500 lowercase">Click to fill</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <button
-                type="button"
-                onClick={() => fillCredentials('hr@company.com', 'password123')}
-                className="p-2.5 text-left rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 hover:border-indigo-500/60 transition-all text-xs"
-              >
-                <div className="font-semibold text-white flex items-center gap-1.5">
-                  <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  Jane Doe (HR)
-                </div>
-                <div className="text-[11px] text-slate-400 truncate mt-0.5">hr@company.com</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => fillCredentials('admin@company.com', 'password123')}
-                className="p-2.5 text-left rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 hover:border-indigo-500/60 transition-all text-xs"
-              >
-                <div className="font-semibold text-white flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                  System Admin
-                </div>
-                <div className="text-[11px] text-slate-400 truncate mt-0.5">admin@company.com</div>
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {staffAccounts.map((account) => (
+                <button
+                  key={account.id}
+                  type="button"
+                  onClick={() => fillCredentials(account.email, account.password)}
+                  className="p-2.5 text-left rounded-lg bg-slate-900/60 hover:bg-slate-900 border border-slate-700/80 hover:border-indigo-500/60 transition-all text-xs group"
+                >
+                  <div className="font-semibold text-white flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 truncate">
+                      {account.role === 'ADMIN' ? (
+                        <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      ) : (
+                        <UserCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      )}
+                      <span className="truncate">{account.displayName.split(' - ')[0]}</span>
+                    </span>
+                    <span className="text-[10px] px-1 py-0.5 rounded bg-slate-800 text-slate-400 group-hover:text-indigo-300">
+                      {account.role}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 truncate mt-0.5 font-mono">{account.email}</div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5">pwd: {account.password}</div>
+                </button>
+              ))}
             </div>
           </div>
         </div>

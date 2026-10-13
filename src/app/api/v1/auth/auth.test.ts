@@ -11,7 +11,7 @@ describe('System Danger Zone & Authentication APIs', () => {
     const req = new NextRequest('http://localhost:3000/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'hr@company.com', password: 'password123' }),
+      body: JSON.stringify({ email: 'hr@company.com', password: 'HrDirector@2026' }),
     });
 
     const res = await loginHandler(req);
@@ -25,6 +25,30 @@ describe('System Danger Zone & Authentication APIs', () => {
     // Check cookie
     const cookies = res.cookies.get('ts_session');
     expect(cookies).toBeDefined();
+  });
+
+  it('POST /api/v1/auth/login logs in using username instead of email', async () => {
+    const req = new NextRequest('http://localhost:3000/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: 'jane.doe', password: 'HrDirector@2026' }),
+    });
+
+    const res = await loginHandler(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.data.user.email).toBe('hr@company.com');
+  });
+
+  it('POST /api/v1/auth/login rejects incorrect password', async () => {
+    const req = new NextRequest('http://localhost:3000/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'hr@company.com', password: 'WrongPassword!99' }),
+    });
+
+    const res = await loginHandler(req);
+    expect(res.status).toBe(401);
   });
 
   it('POST /api/v1/auth/login rejects empty password', async () => {

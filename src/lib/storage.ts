@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import crypto from 'crypto';
 import { logger } from './logger';
@@ -29,7 +30,10 @@ export class LocalPrivateStorageService implements IStorageService {
   private baseDir: string;
 
   constructor(baseDir?: string) {
-    this.baseDir = baseDir ?? path.join(process.cwd(), 'storage', 'private', 'cvs');
+    // Serverless platforms (Vercel/Lambda) only allow writes under the OS temp dir
+    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    const root = isServerless ? os.tmpdir() : process.cwd();
+    this.baseDir = baseDir ?? path.join(root, 'storage', 'private', 'cvs');
   }
 
   private async ensureBaseDir() {
