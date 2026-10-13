@@ -92,6 +92,7 @@ export function CvUploadPrototypeModal({
           fileName: f.name,
           fileSize: f.size,
           mimeType: f.type || 'application/pdf',
+          rawFile: f.file,
         }))
       );
 
