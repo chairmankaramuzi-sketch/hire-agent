@@ -3,7 +3,9 @@ import { UserRole } from '@prisma/client';
 import { getSession, requireRole } from '@/lib/auth';
 import { apiSuccess, apiError, generateRequestId } from '@/lib/apiResponse';
 import { extractionService } from '@/lib/extraction/service';
+import { screeningService } from '@/lib/screening/service';
 import { recordAuditEvent } from '@/lib/audit';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   request: NextRequest,
@@ -37,9 +39,34 @@ export async function POST(
       );
     }
 
-    return apiSuccess(result, undefined, requestId);
+    // Automatically chain deterministic criteria evaluation & scoring
+    let screeningResult = null;
+    try {
+      screeningResult = await screeningService.runScreening(params.applicationId, requestId);
+      await recordAuditEvent({
+        actorUserId: session!.userId,
+        action: 'SCREENING_COMPLETED',
+        resourceType: 'APPLICATION',
+        resourceId: params.applicationId,
+        requestId,
+        metadata: {
+          outcome: screeningResult.evaluation.outcome,
+          totalScore: screeningResult.evaluation.totalScore,
+        },
+      });
+    } catch (screeningErr) {
+      logger.error(
+        'Screening evaluation failed after extraction',
+        screeningErr,
+        { applicationId: params.applicationId },
+        requestId
+      );
+    }
+
+    return apiSuccess({ ...result, screening: screeningResult }, undefined, requestId);
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Processing error';
     return apiError('PROCESSING_ERROR', message, 500, requestId);
   }
 }
+

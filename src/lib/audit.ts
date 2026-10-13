@@ -26,7 +26,26 @@ export async function recordAuditEvent(params: RecordAuditParams) {
       },
     });
     return event;
-  } catch (error) {
+  } catch (error: unknown) {
+    // If foreign key constraint failed on actorUserId (P2003), fallback to unlinked actor
+    const prismaErr = error as { code?: string };
+    if (params.actorUserId && prismaErr?.code === 'P2003') {
+      try {
+        return await prisma.auditEvent.create({
+          data: {
+            actorUserId: null,
+            action: params.action,
+            resourceType: params.resourceType,
+            resourceId: params.resourceId ?? null,
+            requestId: params.requestId ?? null,
+            metadata: params.metadata ? { ...params.metadata, unlinkedActorId: params.actorUserId } : {},
+          },
+        });
+      } catch {
+        // Fall through to error log
+      }
+    }
+
     logger.error('Failed to persist audit event', error, { action: params.action, resourceType: params.resourceType }, params.requestId);
     // Don't throw to avoid breaking primary business flow if audit DB write fails, but log error
     return null;
