@@ -9,13 +9,37 @@ export interface AuthSession {
   displayName: string;
 }
 
+export const SESSION_COOKIE_NAME = 'ts_session';
+
+export function serializeSession(session: AuthSession): string {
+  return Buffer.from(JSON.stringify(session)).toString('base64');
+}
+
 /**
  * Extract authenticated user session from request.
- * Reads verified session headers set by reverse proxy or authentication middleware,
- * or bearer authentication in server environments.
+ * Reads verified session cookie or headers set by reverse proxy or authentication middleware.
  * NEVER trusts client-supplied query params or body parameters for role.
  */
 export async function getSession(request: NextRequest): Promise<AuthSession | null> {
+  // 1. Try reading cookie first
+  try {
+    const cookieVal = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+    if (cookieVal) {
+      const decoded = JSON.parse(Buffer.from(cookieVal, 'base64').toString('utf-8'));
+      if (decoded.userId && decoded.role && Object.values(UserRole).includes(decoded.role as UserRole)) {
+        return {
+          userId: decoded.userId,
+          email: decoded.email ?? 'unknown@example.com',
+          role: decoded.role as UserRole,
+          displayName: decoded.displayName ?? 'User',
+        };
+      }
+    }
+  } catch {
+    // Cookie malformed or unavailable, continue to headers
+  }
+
+  // 2. Fall back to headers
   const userId = request.headers.get('x-user-id');
   const roleHeader = request.headers.get('x-user-role');
   const email = request.headers.get('x-user-email');

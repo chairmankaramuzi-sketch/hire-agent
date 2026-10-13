@@ -1,0 +1,856 @@
+================================================================================
+TALENTSCREEN AI | MULTI-CANDIDATE RECRUITMENT DOSSIER
+BATCH: 30 REALISTIC CANDIDATE CVS
+ROLE: SENIOR FULL-STACK ENGINEER (job-001)
+TOTAL CANDIDATES IN DOSSIER: 30
+================================================================================
+
+This document contains 30 candidate CV documents formatted sequentially.
+Each candidate record is preceded by a '=== CANDIDATE #XX ===' boundary.
+
+================================================================================
+=== CANDIDATE #01: ELENA ROSTOVA ===
+================================================================================
+Full Name: Elena Rostova
+Target Role: Senior Full-Stack Engineer
+Email: elena.rostova@techmail.io
+Phone: +44 7700 900101
+Location: London, UK
+Years of Commercial Experience: 6.5 years
+Highest Degree: MSc Advanced Computing (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Senior software engineer with 6.5 years building robust web apps. Deep expertise in React hooks, TypeScript type safety, and relational PostgreSQL database architectures.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Next.js, Node.js, PostgreSQL, Vitest, Docker, Prisma
+
+COMMERCIAL WORK EXPERIENCE:
+  * Lead Full-Stack Engineer at FinTech Nexus UK (2021 - Present)
+    Architected Next.js and Node.js microservices handling 2M+ monthly transactions. Enforced 90% Vitest unit test coverage and PostgreSQL query optimizations.
+  * Full-Stack Developer at CloudPulse Software (2018 - 2021)
+    Developed TypeScript customer-facing portals and RESTful APIs backed by PostgreSQL and Prisma ORM.
+
+EDUCATION & CREDENTIALS:
+  * MSc Advanced Computing - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #02: MARCUS VANCE ===
+================================================================================
+Full Name: Marcus Vance
+Target Role: Senior Full-Stack Engineer
+Email: marcus.vance@devstack.org
+Phone: +1 415 555 0192
+Location: San Francisco, CA
+Years of Commercial Experience: 5 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Full-stack developer with 5 years commercial production experience in cloud SaaS platforms using TypeScript and PostgreSQL.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Docker, Jest, Redis, GraphQL
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Software Engineer at SaaSify Labs (2022 - Present)
+    Engineered high-throughput TypeScript backend services and modern React frontends. Implemented end-to-end integration tests with Jest.
+  * Software Engineer at BayArea Cloud (2019 - 2022)
+    Built scalable REST APIs in Node.js and maintained relational schemas in PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #03: PRIYA SHARMA ===
+================================================================================
+Full Name: Priya Sharma
+Target Role: Senior Full-Stack Engineer
+Email: priya.sharma@indiadev.in
+Phone: +91 98200 12345
+Location: Bangalore, India (Remote)
+Years of Commercial Experience: 4.5 years
+Highest Degree: B.Tech Computer Science & Engineering (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Passionate full-stack engineer with 4.5 years of experience delivering performant React and Next.js applications.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, Next.js, React, Node.js, PostgreSQL, Vitest, TailwindCSS
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Web Developer at Infosys Digital (2021 - Present)
+    Led a team of 4 engineers building enterprise dashboard apps using TypeScript, Next.js, and PostgreSQL.
+  * Software Engineer at TechMahindra Innovations (2019 - 2021)
+    Created backend services in Node.js and maintained automated test suites.
+
+EDUCATION & CREDENTIALS:
+  * B.Tech Computer Science & Engineering - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #04: DAVID KIM ===
+================================================================================
+Full Name: David Kim
+Target Role: Senior Full-Stack Engineer
+Email: david.kim@austintech.io
+Phone: +1 512 555 8899
+Location: Austin, TX
+Years of Commercial Experience: 7 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Experienced engineer with 7 years architecting enterprise applications in TypeScript, React, and Node.js.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Prisma, Vitest, AWS, CI/CD
+
+COMMERCIAL WORK EXPERIENCE:
+  * Lead Developer at Apex Cloud Solutions (2020 - Present)
+    Directed migration from legacy monolith to TypeScript/Node.js microservices with PostgreSQL.
+  * Full-Stack Developer at Austin Interactive (2017 - 2020)
+    Delivered customer portals using React, Node.js, and relational databases.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #05: ARTHUR PENDELTON ===
+================================================================================
+Full Name: Arthur Pendelton
+Target Role: Senior Full-Stack Engineer
+Email: arthur.pendelton@oxon.co.uk
+Phone: +44 7700 900222
+Location: Oxford, UK
+Years of Commercial Experience: 3.5 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Software engineer with 3.5 years developing modern TypeScript and Node.js cloud solutions.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Jest, Docker
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Engineer at Oxon Analytics (2021 - Present)
+    Built data dashboard frontends with React and backend ingestion workers with Node.js and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #06: FATIMA AL-ZAHRA ===
+================================================================================
+Full Name: Fatima Al-Zahra
+Target Role: Senior Full-Stack Engineer
+Email: fatima.alzahra@gulftech.ae
+Phone: +971 50 123 4567
+Location: Dubai, UAE
+Years of Commercial Experience: 5.5 years
+Highest Degree: BSc Software Engineering (Software Engineering)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+5.5 years in cloud-native application engineering with a strong focus on clean code and reliable PostgreSQL schemas.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Jest, GraphQL, Docker
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Software Engineer at Emirates Digital Hub (2021 - Present)
+    Built enterprise web apps in React and TypeScript with comprehensive Jest test coverage.
+
+EDUCATION & CREDENTIALS:
+  * BSc Software Engineering - Accredited Institution (Software Engineering)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #07: CARLOS MENDEZ ===
+================================================================================
+Full Name: Carlos Mendez
+Target Role: Senior Full-Stack Engineer
+Email: carlos.mendez@madridcode.es
+Phone: +34 91 123 4567
+Location: Madrid, Spain
+Years of Commercial Experience: 4 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+4 years experience delivering responsive web applications with TypeScript, React, and PostgreSQL.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest, Prisma
+
+COMMERCIAL WORK EXPERIENCE:
+  * Full-Stack Developer at Iberia Tech Services (2020 - Present)
+    Maintained core SaaS portal in React/Node.js with PostgreSQL backend.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #08: CHLOE DUBOIS ===
+================================================================================
+Full Name: Chloe Dubois
+Target Role: Senior Full-Stack Engineer
+Email: chloe.dubois@paristech.fr
+Phone: +33 1 42 68 00 00
+Location: Paris, France
+Years of Commercial Experience: 6 years
+Highest Degree: MSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+MSc graduate with 6 years experience specializing in Next.js, Node.js backend systems, and PostgreSQL architectures.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, Next.js, Node.js, PostgreSQL, Docker, Vitest, Kubernetes
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Cloud Developer at Veloce Systems Paris (2020 - Present)
+    Led architecture of cloud microservices with TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * MSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #09: LIAM O'CONNOR ===
+================================================================================
+Full Name: Liam O'Connor
+Target Role: Senior Full-Stack Engineer
+Email: liam.oconnor@dublindev.ie
+Phone: +353 1 496 0000
+Location: Dublin, Ireland
+Years of Commercial Experience: 4.2 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+4.2 years of production experience in Dublin tech ecosystem building scalable TypeScript applications.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Jest, CI/CD
+
+COMMERCIAL WORK EXPERIENCE:
+  * Full-Stack Engineer at Silicon Docks Tech (2020 - Present)
+    Built high performance web frontends and Node.js backend APIs.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #10: KENJI TAKAHASHI ===
+================================================================================
+Full Name: Kenji Takahashi
+Target Role: Senior Full-Stack Engineer
+Email: kenji.takahashi@tokyosoft.jp
+Phone: +81 3 5555 0143
+Location: Tokyo, Japan
+Years of Commercial Experience: 5 years
+Highest Degree: BSc Information Technology (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+5 years building resilient web services with React, Node.js, and relational database modeling.
+
+TECHNICAL SKILLS & COMPETENCIES:
+React, TypeScript, Node.js, PostgreSQL, Docker, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Systems Engineer at Tokyo Cloud Works (2019 - Present)
+    Engineered web applications and automated CI/CD pipeline with Vitest.
+
+EDUCATION & CREDENTIALS:
+  * BSc Information Technology - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #11: SARAH JENKINS ===
+================================================================================
+Full Name: Sarah Jenkins
+Target Role: Senior Full-Stack Engineer
+Email: sarah.jenkins@bristolcode.co.uk
+Phone: +44 7700 900333
+Location: Bristol, UK
+Years of Commercial Experience: 3.8 years
+Highest Degree: BSc Software Engineering (Software Engineering)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Full-stack software engineer with 3.8 years building data-intensive applications.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Developer at Bristol Engine Works (2020 - Present)
+    Developed modern web applications using TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * BSc Software Engineering - Accredited Institution (Software Engineering)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #12: MATEO ROSSI ===
+================================================================================
+Full Name: Mateo Rossi
+Target Role: Senior Full-Stack Engineer
+Email: mateo.rossi@milanotech.it
+Phone: +39 02 5555 1234
+Location: Milan, Italy
+Years of Commercial Experience: 5.2 years
+Highest Degree: BSc Computer Engineering (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+5.2 years developing scalable backend architectures and React user interfaces.
+
+TECHNICAL SKILLS & COMPETENCIES:
+Node.js, TypeScript, React, PostgreSQL, Docker, Jest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Full-Stack Engineer at Lombardy Digital Labs (2019 - Present)
+    Managed PostgreSQL database schemas and built Node.js microservices.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Engineering - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #13: AMINA DIALLO ===
+================================================================================
+Full Name: Amina Diallo
+Target Role: Senior Full-Stack Engineer
+Email: amina.diallo@africatech.sn
+Phone: +221 33 800 0000
+Location: Dakar, Senegal
+Years of Commercial Experience: 4.8 years
+Highest Degree: MSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+4.8 years experience in fintech and cloud platforms using TypeScript and Next.js.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Next.js, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Lead Web Engineer at Dakar FinServices (2020 - Present)
+    Delivered web banking portal with TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * MSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #14: BENJAMIN MILLER ===
+================================================================================
+Full Name: Benjamin Miller
+Target Role: Senior Full-Stack Engineer
+Email: benjamin.miller@chicagotech.io
+Phone: +1 312 555 4321
+Location: Chicago, IL
+Years of Commercial Experience: 6 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+6 years of full-stack engineering with extensive testing and relational SQL architecture.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest, Docker
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Engineer at Midwest Software Group (2018 - Present)
+    Led technical design of web portals with Vitest automated testing.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #15: YUKI TANAKA ===
+================================================================================
+Full Name: Yuki Tanaka
+Target Role: Senior Full-Stack Engineer
+Email: yuki.tanaka@vanbc.ca
+Phone: +1 604 555 7890
+Location: Vancouver, Canada
+Years of Commercial Experience: 4 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+4 years building clean and reliable web applications in TypeScript and Node.js.
+
+TECHNICAL SKILLS & COMPETENCIES:
+React, TypeScript, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Full-Stack Developer at Pacific Rim Cloud (2020 - Present)
+    Engineered web applications and automated test suites.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #16: OLIVER BENNETT ===
+================================================================================
+Full Name: Oliver Bennett
+Target Role: Senior Full-Stack Engineer
+Email: oliver.bennett@uktech.co.uk
+Phone: +44 7700 900444
+Location: Manchester, UK
+Years of Commercial Experience: 2.8 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+2.8 years experience. Excellent technical skills in TypeScript, React, and PostgreSQL.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Jest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Developer at Manchester Codehouse (2021 - Present)
+    Developed modern web applications. Total commercial tenure: 2.8 years.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #17: SOPHIE MARTIN ===
+================================================================================
+Full Name: Sophie Martin
+Target Role: Senior Full-Stack Engineer
+Email: sophie.martin@lyoncode.fr
+Phone: +33 4 72 00 00 00
+Location: Lyon, France
+Years of Commercial Experience: 5 years
+Highest Degree: Coding Bootcamp Diploma in Full-Stack Web Development (Vocational Web Bootcamp)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+5 years commercial experience building web apps. Graduate of intensive full-stack bootcamp.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Prisma, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Web Developer at Rhone Digital (2019 - Present)
+    Engineered React and Node.js solutions with PostgreSQL for 5 years.
+
+EDUCATION & CREDENTIALS:
+  * Coding Bootcamp Diploma in Full-Stack Web Development - Accredited Institution (Vocational Web Bootcamp)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #18: TARIQ MANSOOR ===
+================================================================================
+Full Name: Tariq Mansoor
+Target Role: Senior Full-Stack Engineer
+Email: tariq.mansoor@techpak.pk
+Phone: +92 21 3555 1234
+Location: Karachi, Pakistan
+Years of Commercial Experience: 3.5 years
+Highest Degree: BSc Electrical Engineering (Electrical Engineering)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+3.5 years experience in web application development with strong mathematical and algorithmic background.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Engineer at Karachi Software House (2020 - Present)
+    Developed full-stack web applications using TypeScript and relational databases.
+
+EDUCATION & CREDENTIALS:
+  * BSc Electrical Engineering - Accredited Institution (Electrical Engineering)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #19: EMMA WATSON-SMITH ===
+================================================================================
+Full Name: Emma Watson-Smith
+Target Role: Senior Full-Stack Engineer
+Email: emma.watsonsmith@cambridge.ac.uk
+Phone: +44 7700 900555
+Location: Cambridge, UK
+Years of Commercial Experience: 2.5 years
+Highest Degree: BSc Computer Science (First Class Hons) (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+First-class Cambridge CS graduate with 2.5 years industry experience and exceptional technical projects.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Next.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Engineer at Silicon Fen Systems (2022 - Present)
+    Developed modern React applications with TypeScript and Vitest.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science (First Class Hons) - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #20: VIKRAM PATEL ===
+================================================================================
+Full Name: Vikram Patel
+Target Role: Senior Full-Stack Engineer
+Email: vikram.patel@mumbaitech.in
+Phone: +91 22 2555 6789
+Location: Mumbai, India
+Years of Commercial Experience: 6 years
+Highest Degree: Self-Taught / High School Diploma (None)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+6 years of production web engineering. Self-taught open source contributor with proven architectural mastery.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Docker, Vitest, Redis
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Software Engineer at Mumbai Cloud Studio (2018 - Present)
+    Built scalable web applications for 6 years using TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * Self-Taught / High School Diploma - Accredited Institution (None)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #21: LUCAS SILVA ===
+================================================================================
+Full Name: Lucas Silva
+Target Role: Senior Full-Stack Engineer
+Email: lucas.silva@saopaulo.br
+Phone: +55 11 9999 1234
+Location: São Paulo, Brazil
+Years of Commercial Experience: 3.2 years
+Highest Degree: Bachelor of Mathematics & Statistics (Mathematics)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+3.2 years software development with strong analytical foundation in mathematics.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Jest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Full-Stack Developer at Paulista Digital (2021 - Present)
+    Built financial web apps in TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * Bachelor of Mathematics & Statistics - Accredited Institution (Mathematics)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #22: NADIA CHERNOVA ===
+================================================================================
+Full Name: Nadia Chernova
+Target Role: Senior Full-Stack Engineer
+Email: nadia.chernova@eutec.eu
+Phone: +48 22 555 4321
+Location: Warsaw, Poland
+Years of Commercial Experience: 2.9 years
+Highest Degree: BSc Software Engineering (Software Engineering)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+2.9 years building modern web applications with strict unit test coverage.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Developer at Vistula Cloud Labs (2021 - Present)
+    Developed web services in TypeScript and Vitest.
+
+EDUCATION & CREDENTIALS:
+  * BSc Software Engineering - Accredited Institution (Software Engineering)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #23: GRACE HOPPER-COLE ===
+================================================================================
+Full Name: Grace Hopper-Cole
+Target Role: Senior Full-Stack Engineer
+Email: grace.hoppercole@nytech.com
+Phone: +1 212 555 9876
+Location: New York, NY
+Years of Commercial Experience: 4 years
+Highest Degree: BSc Applied Physics (Physics)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+4 years web development after transitioning from academic physics.
+
+TECHNICAL SKILLS & COMPETENCIES:
+TypeScript, React, Node.js, PostgreSQL, Vitest
+
+COMMERCIAL WORK EXPERIENCE:
+  * Software Engineer at Manhattan Tech Works (2020 - Present)
+    Engineered web services with TypeScript and PostgreSQL.
+
+EDUCATION & CREDENTIALS:
+  * BSc Applied Physics - Accredited Institution (Physics)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #24: KEVIN SPACEY-LEE ===
+================================================================================
+Full Name: Kevin Spacey-Lee
+Target Role: Senior Full-Stack Engineer
+Email: kevin.spaceylee@gradmail.com
+Phone: +1 415 555 9900
+Location: San Jose, CA
+Years of Commercial Experience: 0.8 years
+Highest Degree: BSc Computer Science (Computer Science)
+Accredited CS/SE Degree: Yes
+
+PROFESSIONAL SUMMARY:
+Recent CS graduate with 8 months internship experience in frontend development.
+
+TECHNICAL SKILLS & COMPETENCIES:
+HTML, CSS, Basic React, JavaScript
+
+COMMERCIAL WORK EXPERIENCE:
+  * Frontend Intern at Silicon Valley Startups (2023 - Present)
+    Assisted in styling React components.
+
+EDUCATION & CREDENTIALS:
+  * BSc Computer Science - Accredited Institution (Computer Science)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #25: AMANDA RIVERA ===
+================================================================================
+Full Name: Amanda Rivera
+Target Role: Senior Full-Stack Engineer
+Email: amanda.rivera@designhub.com
+Phone: +1 305 555 3344
+Location: Miami, FL
+Years of Commercial Experience: 4 years
+Highest Degree: Bachelor of Fine Arts (Graphic Design) (Fine Arts)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+4 years experience as visual designer and Figma specialist with no backend or TypeScript coding experience.
+
+TECHNICAL SKILLS & COMPETENCIES:
+Figma, Adobe Photoshop, Illustrator, HTML, CSS
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior UI Designer at Miami Creative Agency (2020 - Present)
+    Created UI wireframes and brand guidelines in Figma.
+
+EDUCATION & CREDENTIALS:
+  * Bachelor of Fine Arts (Graphic Design) - Accredited Institution (Fine Arts)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #26: JOSHUA TAYLOR ===
+================================================================================
+Full Name: Joshua Taylor
+Target Role: Senior Full-Stack Engineer
+Email: joshua.taylor@saassales.com
+Phone: +44 7700 900666
+Location: Leeds, UK
+Years of Commercial Experience: 5 years
+Highest Degree: BA Business Administration & Marketing (Business)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+5 years closing enterprise software deals. Looking to transition into technology management.
+
+TECHNICAL SKILLS & COMPETENCIES:
+Salesforce, Hubspot, Enterprise Negotiation, Pipeline Management
+
+COMMERCIAL WORK EXPERIENCE:
+  * Senior Account Executive at CloudSales UK (2019 - Present)
+    Closed enterprise software subscriptions.
+
+EDUCATION & CREDENTIALS:
+  * BA Business Administration & Marketing - Accredited Institution (Business)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #27: HANNAH SCHMIDT ===
+================================================================================
+Full Name: Hannah Schmidt
+Target Role: Senior Full-Stack Engineer
+Email: hannah.schmidt@berlindev.de
+Phone: +49 30 5555 9876
+Location: Berlin, Germany
+Years of Commercial Experience: 1.2 years
+Highest Degree: Abitur / High School Diploma (None)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+1.2 years assisting with WordPress sites and static marketing pages.
+
+TECHNICAL SKILLS & COMPETENCIES:
+HTML5, CSS3, Basic JavaScript, WordPress
+
+COMMERCIAL WORK EXPERIENCE:
+  * Junior Web Assistant at Berlin Media Agency (2023 - Present)
+    Edited WordPress templates and updated web content.
+
+EDUCATION & CREDENTIALS:
+  * Abitur / High School Diploma - Accredited Institution (None)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #28: DMITRI VORONOV ===
+================================================================================
+Full Name: Dmitri Voronov
+Target Role: Senior Full-Stack Engineer
+Email: dmitri.voronov@microchip.org
+Phone: +372 600 0000
+Location: Tallinn, Estonia
+Years of Commercial Experience: 6 years
+Highest Degree: BSc Electrical Engineering (Electrical Engineering)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+6 years writing low-level microcontroller firmware. Zero web or cloud development experience.
+
+TECHNICAL SKILLS & COMPETENCIES:
+C, Assembly, RTOS, ARM Cortex, Hardware Debugging
+
+COMMERCIAL WORK EXPERIENCE:
+  * Firmware Engineer at Baltic Robotics (2018 - Present)
+    Programmed embedded C algorithms on bare-metal hardware.
+
+EDUCATION & CREDENTIALS:
+  * BSc Electrical Engineering - Accredited Institution (Electrical Engineering)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #29: ZOE CHEN ===
+================================================================================
+Full Name: Zoe Chen
+Target Role: Senior Full-Stack Engineer
+Email: zoe.chen@contentseo.com
+Phone: +1 416 555 4567
+Location: Toronto, Canada
+Years of Commercial Experience: 3 years
+Highest Degree: BA English Literature (Humanities)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+3 years optimizing blog posts and landing pages for organic search visibility.
+
+TECHNICAL SKILLS & COMPETENCIES:
+Google Analytics, Ahrefs, Technical SEO, Copywriting
+
+COMMERCIAL WORK EXPERIENCE:
+  * SEO Manager at Toronto Growth Media (2021 - Present)
+    Managed content strategy and keyword research.
+
+EDUCATION & CREDENTIALS:
+  * BA English Literature - Accredited Institution (Humanities)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================
+
+
+================================================================================
+=== CANDIDATE #30: TYLER ROBINSON ===
+================================================================================
+Full Name: Tyler Robinson
+Target Role: Senior Full-Stack Engineer
+Email: tyler.robinson@bootcamper.io
+Phone: +1 206 555 1122
+Location: Seattle, WA
+Years of Commercial Experience: 0.3 years
+Highest Degree: BA History (Humanities)
+Accredited CS/SE Degree: No
+
+PROFESSIONAL SUMMARY:
+Recent 12-week coding bootcamp graduate with history degree looking for first technical role.
+
+TECHNICAL SKILLS & COMPETENCIES:
+JavaScript, HTML, CSS, Git
+
+COMMERCIAL WORK EXPERIENCE:
+  * Junior Web Intern at Seattle Digital Startup (2024 - Present)
+    Completed 12-week coding course and 3-month unpaid internship.
+
+EDUCATION & CREDENTIALS:
+  * BA History - Accredited Institution (Humanities)
+  * Relevant Coursework: Algorithms, Relational Databases, Software Engineering
+================================================================================

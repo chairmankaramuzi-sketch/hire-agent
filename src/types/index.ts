@@ -181,4 +181,6 @@ export interface DashboardMetrics {
   totalApplications: number;
   awaitingReview: number;
   processingFailures: number;
+  pendingReviews?: number;
+  recommendedApplications?: number;
 }
