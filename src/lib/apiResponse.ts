@@ -16,6 +16,9 @@ export interface ApiSuccessResponse<T> {
     total?: number;
     page?: number;
     limit?: number;
+    totalPages?: number;
+    metrics?: any;
+    [key: string]: unknown;
   };
 }
 

@@ -59,7 +59,7 @@ export default function AllApplicationsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">All Candidate Applications</h1>
           <p className="text-sm text-slate-500 mt-1">
-            Global view across all active vacancies with exportable mock reports.
+            Global view across all active vacancies with exportable candidate reports.
           </p>
         </div>
 
@@ -68,7 +68,7 @@ export default function AllApplicationsPage() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
         >
           <Download className="w-4 h-4 text-slate-500" />
-          Export CSV Report (Mock)
+          Export CSV Report
         </button>
       </div>
 

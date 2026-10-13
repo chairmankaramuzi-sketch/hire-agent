@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   UserCheck,
 } from 'lucide-react';
-import { mockCurrentUser } from '@/services/mockData';
+import { authService, activeUser } from '@/services/auth';
+import { User } from '@/types';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -23,6 +24,11 @@ const navItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [currentUser, setCurrentUser] = React.useState<User>(activeUser);
+
+  React.useEffect(() => {
+    authService.getCurrentUser().then((u) => setCurrentUser(u));
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
@@ -71,14 +77,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-slate-200 bg-slate-50/50">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-semibold text-xs border border-indigo-200">
-              {mockCurrentUser.name.slice(0, 2).toUpperCase()}
+              {currentUser.name.slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-slate-900 truncate">
-                {mockCurrentUser.name}
+                {currentUser.name}
               </p>
               <div className="flex items-center gap-1">
-                <span className="text-[11px] text-slate-500">{mockCurrentUser.role}</span>
+                <span className="text-[11px] text-slate-500">{currentUser.role}</span>
                 <span className="text-[10px] bg-indigo-50 text-indigo-700 px-1 rounded font-medium">Active</span>
               </div>
             </div>

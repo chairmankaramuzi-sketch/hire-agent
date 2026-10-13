@@ -17,3 +17,10 @@ export const prisma =
 if (getEnv().NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
+
+// Ensure BigInt values (e.g. cvAsset.sizeBytes) serialize cleanly to JSON
+if (typeof BigInt !== 'undefined' && !(BigInt.prototype as any).toJSON) {
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
+}

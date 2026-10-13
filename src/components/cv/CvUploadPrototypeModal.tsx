@@ -147,49 +147,6 @@ export function CvUploadPrototypeModal({
             />
           </label>
 
-          {/* Quick Pre-fab Sample Generator Buttons */}
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-500 font-medium">Add test fixtures:</span>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedFiles((prev) => [
-                  ...prev,
-                  {
-                    id: String(Date.now() + 1),
-                    file: new File([''], 'David_Standard_CV.pdf'),
-                    name: 'David_Standard_CV.pdf',
-                    size: 245000,
-                    type: 'application/pdf',
-                    isValid: true,
-                  },
-                ]);
-              }}
-              className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium"
-            >
-              + Normal CV
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedFiles((prev) => [
-                  ...prev,
-                  {
-                    id: String(Date.now() + 2),
-                    file: new File([''], 'Corrupted_Scan_File.pdf'),
-                    name: 'Corrupted_Scan_File.pdf',
-                    size: 512000,
-                    type: 'application/pdf',
-                    isValid: true,
-                  },
-                ]);
-              }}
-              className="px-2.5 py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-medium"
-            >
-              + Sim. Corrupted CV
-            </button>
-          </div>
-
           {/* Selected File List */}
           {selectedFiles.length > 0 && (
             <div className="space-y-2">

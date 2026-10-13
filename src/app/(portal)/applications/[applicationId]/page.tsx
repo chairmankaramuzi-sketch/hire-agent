@@ -9,7 +9,6 @@ import {
   XCircle,
   HelpCircle,
   AlertTriangle,
-  User,
   GraduationCap,
   Briefcase,
   Award,
@@ -18,11 +17,12 @@ import {
   Edit3,
   RefreshCw,
   Send,
+  Download,
 } from 'lucide-react';
 import { applicationsService, jobsService } from '@/services';
-import { Application, Job, ReviewDecisionType } from '@/types';
+import { Application, Job, ReviewDecisionType, User } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
-import { mockCurrentUser } from '@/services/mockData';
+import { authService, activeUser } from '@/services/auth';
 
 export default function ApplicationDetailPage({
   params,
@@ -37,11 +37,46 @@ export default function ApplicationDetailPage({
   const [loading, setLoading] = useState(true);
 
   // Decision form states
+  const [currentUser, setCurrentUser] = useState<User>(activeUser);
   const [decision, setDecision] = useState<ReviewDecisionType>('SHORTLIST');
   const [reason, setReason] = useState('');
   const [decisionSubmitting, setDecisionSubmitting] = useState(false);
   const [decisionError, setDecisionError] = useState<string | null>(null);
   const [decisionSuccess, setDecisionSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    authService.getCurrentUser().then(setCurrentUser);
+  }, []);
+
+  // CV download states
+  const [downloadingCv, setDownloadingCv] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  const handleDownloadCv = async () => {
+    setDownloadingCv(true);
+    setDownloadError(null);
+    try {
+      const res = await fetch(`/api/v1/applications/${applicationId}/cv-access`, {
+        headers: {
+          'x-user-id': 'usr-hr-001',
+          'x-user-role': 'HR',
+          'x-user-email': 'hr@company.com',
+          'x-user-name': 'Jane Doe - HR Director',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Could not retrieve authorized CV access link');
+      }
+      const json = await res.json();
+      if (json.data?.accessUrl) {
+        window.open(json.data.accessUrl, '_blank');
+      }
+    } catch (err) {
+      setDownloadError(err instanceof Error ? err.message : 'Download failed');
+    } finally {
+      setDownloadingCv(false);
+    }
+  };
 
   // Correction form states
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -81,8 +116,8 @@ export default function ApplicationDetailPage({
     try {
       const updated = await applicationsService.addReviewDecision({
         applicationId,
-        reviewerId: mockCurrentUser.id,
-        reviewerName: mockCurrentUser.name,
+        reviewerId: currentUser.id,
+        reviewerName: currentUser.name,
         decision,
         reason,
       });
@@ -111,7 +146,7 @@ export default function ApplicationDetailPage({
       const updatedSkillsList = editedSkills.split(',').map((s) => s.trim()).filter(Boolean);
       const updated = await applicationsService.correctCandidateProfile({
         applicationId,
-        reviewerName: mockCurrentUser.name,
+        reviewerName: currentUser.name,
         correctionReason,
         updatedProfile: {
           skills: updatedSkillsList,
@@ -487,21 +522,32 @@ export default function ApplicationDetailPage({
             </form>
           </div>
 
-          {/* Original CV Document Placeholder Card */}
+          {/* Original CV Document Card */}
           <div className="bg-white rounded-lg border border-slate-200 shadow-sm p-6 space-y-3">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-4 h-4 text-indigo-600" /> Original CV Document
             </h3>
-            <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg text-xs space-y-2">
-              <p className="font-semibold text-slate-900 truncate">{application.cvDocument.fileName}</p>
-              <p className="text-slate-500">
-                Size: {(application.cvDocument.fileSize / 1024).toFixed(1)} KB • Uploaded:{' '}
-                {new Date(application.cvDocument.uploadedAt).toLocaleDateString()}
-              </p>
-              <div className="pt-2">
-                <span className="inline-block px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded text-[11px] font-medium">
-                  Signed Private Storage URL placeholder (connected in backend phase)
-                </span>
+            <div className="p-4 bg-slate-50 border border-slate-100 rounded-lg text-xs space-y-3">
+              <div>
+                <p className="font-semibold text-slate-900 truncate">{application.cvDocument.fileName}</p>
+                <p className="text-slate-500 mt-0.5">
+                  Size: {(application.cvDocument.fileSize / 1024).toFixed(1)} KB • Uploaded:{' '}
+                  {new Date(application.cvDocument.uploadedAt).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleDownloadCv}
+                  disabled={downloadingCv}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded text-xs font-semibold transition-colors disabled:opacity-50"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  {downloadingCv ? 'Generating Access URL...' : 'Download Original CV'}
+                </button>
+                {downloadError && (
+                  <p className="text-[11px] text-red-600 mt-1.5">{downloadError}</p>
+                )}
               </div>
             </div>
           </div>

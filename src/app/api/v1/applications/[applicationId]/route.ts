@@ -50,6 +50,16 @@ export async function GET(
           },
         },
       },
+      extractions: {
+        where: { status: 'COMPLETED' },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        include: {
+          evidence: {
+            orderBy: { fieldKey: 'asc' },
+          },
+        },
+      },
     },
   });
 
