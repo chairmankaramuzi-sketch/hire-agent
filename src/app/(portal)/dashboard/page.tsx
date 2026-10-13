@@ -123,10 +123,26 @@ export default function DashboardPage() {
             Overview of active vacancies, CV screening runs, and required human reviews.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => handleAction('seed-users')}
+            disabled={dangerLoading !== null}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold text-xs shadow-xs transition-colors"
+          >
+            <UserCog className="w-3.5 h-3.5 text-emerald-600" />
+            {dangerLoading === 'seed-users' ? 'Restoring Users...' : 'Restore Test Users'}
+          </button>
+          <a
+            href="#danger-zone"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-300 font-semibold text-xs shadow-xs transition-colors"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+            Testing & Danger Zone
+          </a>
           <Link
             href="/jobs/new"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm shadow-sm transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs shadow-sm transition-colors"
           >
             <PlusCircle className="w-4 h-4" />
             Create Vacancy
@@ -333,7 +349,7 @@ export default function DashboardPage() {
       )}
 
       {/* DANGER ZONE & SYSTEM INITIALIZATION */}
-      <div className="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden">
+      <div id="danger-zone" className="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden scroll-mt-6">
         <div className="p-5 bg-gradient-to-r from-rose-50/80 via-white to-amber-50/40 border-b border-rose-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
@@ -452,7 +468,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <UserCog className="w-3.5 h-3.5" />
-                  Restore Users
+                  Restore Test Users
                 </>
               )}
             </button>

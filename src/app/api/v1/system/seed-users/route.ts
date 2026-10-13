@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
     request,
     'USERS_SEEDED',
     () => seedUsers(),
-    r => `Restored ${r.staff} staff accounts and ${r.applicants} applicant accounts with their default passwords.`
+    r => `Restored ${r.staff} staff accounts and ${r.applicants} applicant accounts with their default passwords.`,
+    { requireAuth: false }
   );
 }

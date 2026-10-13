@@ -13,8 +13,12 @@ import {
   UserCheck,
   KeyRound,
   AlertCircle,
+  UserCog,
+  CheckCircle2,
+  RefreshCw,
 } from 'lucide-react';
 import { authService } from '@/services/auth';
+import { systemService } from '@/services/system';
 import { staffAccounts } from '@/lib/data/staffAccounts';
 
 export default function LoginPage() {
@@ -25,6 +29,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Restore users state
+  const [seedLoading, setSeedLoading] = useState(false);
+  const [seedSuccess, setSeedSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,10 +50,25 @@ export default function LoginPage() {
     }
   };
 
+  const handleRestoreUsers = async () => {
+    setSeedLoading(true);
+    setSeedSuccess(null);
+    setError(null);
+    try {
+      const res = await systemService.seedUsers();
+      setSeedSuccess(res.message);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to restore test users in database');
+    } finally {
+      setSeedLoading(false);
+    }
+  };
+
   const fillCredentials = (emailVal: string, passVal: string) => {
     setUsername(emailVal);
     setPassword(passVal);
     setError(null);
+    setSeedSuccess(null);
   };
 
   return (
@@ -200,6 +223,35 @@ export default function LoginPage() {
                   <div className="text-[10px] text-slate-500 font-mono mt-0.5">pwd: {account.password}</div>
                 </button>
               ))}
+            </div>
+
+            {/* Direct Restore Test Users button right on login screen */}
+            <div className="mt-4 pt-3 border-t border-slate-700/40">
+              <button
+                type="button"
+                onClick={handleRestoreUsers}
+                disabled={seedLoading}
+                className="w-full py-2.5 px-3 rounded-lg bg-emerald-950/70 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all disabled:opacity-50"
+              >
+                {seedLoading ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Restoring Test Users in Database...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserCog className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Restore Test Users in DB</span>
+                  </>
+                )}
+              </button>
+
+              {seedSuccess && (
+                <div className="mt-2.5 p-2.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>{seedSuccess}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

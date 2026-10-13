@@ -5,22 +5,27 @@ import { apiSuccess, apiError, generateRequestId } from '@/lib/apiResponse';
 import { recordAuditEvent } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 
-type SystemHandler<T> = (ctx: { session: AuthSession; requestId: string }) => Promise<T>;
+type SystemHandler<T> = (ctx: { session: AuthSession | null; requestId: string }) => Promise<T>;
 
 /**
- * Wraps a Danger Zone operation: requires a signed-in ADMIN/HR session,
+ * Wraps a Danger Zone operation: requires a signed-in ADMIN/HR session by default,
  * records an audit event, and returns a consistent JSON envelope with timing.
  */
 export async function runSystemAction<T extends Record<string, unknown>>(
   request: NextRequest,
   action: string,
   handler: SystemHandler<T>,
-  buildMessage: (result: T) => string
+  buildMessage: (result: T) => string,
+  options?: { requireAuth?: boolean }
 ) {
+  const requireAuth = options?.requireAuth ?? true;
   const requestId = request.headers.get('x-request-id') ?? generateRequestId();
   const session = await getSession(request);
-  const denied = requireRole([UserRole.ADMIN, UserRole.HR], session, requestId);
-  if (denied) return denied;
+
+  if (requireAuth) {
+    const denied = requireRole([UserRole.ADMIN, UserRole.HR], session, requestId);
+    if (denied) return denied;
+  }
 
   const started = Date.now();
   try {
@@ -28,7 +33,7 @@ export async function runSystemAction<T extends Record<string, unknown>>(
     const durationMs = Date.now() - started;
 
     await recordAuditEvent({
-      actorUserId: session!.userId,
+      actorUserId: session?.userId || 'usr-admin-001',
       action,
       resourceType: 'SYSTEM',
       resourceId: 'all',
