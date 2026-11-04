@@ -156,6 +156,7 @@ export interface ReviewDecision {
 export interface Application {
   id: string;
   jobId: string;
+  jobTitle?: string;
   applicantId: string;
   applicant: Applicant;
   source: 'APPLICANT_PORTAL' | 'HR_UPLOAD';

@@ -174,6 +174,7 @@ export function mapPrismaApplicationToDomain(item: any): Application {
   return {
     id: item.id,
     jobId: item.jobId,
+    jobTitle: item.job?.title || (item.jobId === 'job-002' ? 'Senior Technical Product Manager' : 'Senior Full-Stack Engineer'),
     applicantId: item.applicantUserId || `usr-${item.id}`,
     applicant: {
       id: item.applicantUserId || `usr-${item.id}`,
@@ -277,7 +278,7 @@ export const applicationsService = {
 
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json.data) && json.data.length > 0) {
+        if (Array.isArray(json.data)) {
           let items: Application[] = json.data.map(mapPrismaApplicationToDomain);
 
           if (filter?.queue && filter.queue !== 'ALL') {
@@ -537,11 +538,27 @@ export const applicationsService = {
     correctionReason: string;
     updatedProfile: Partial<CandidateProfile>;
   }): Promise<Application> {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
     if (!params.correctionReason.trim()) {
       throw new Error('An audit reason is required when correcting candidate facts');
     }
+
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/v1/applications/${params.applicationId}/evidence`, {
+        method: 'PATCH',
+        headers: defaultHeaders,
+        body: JSON.stringify({
+          correctionReason: params.correctionReason.trim(),
+          updatedProfile: params.updatedProfile,
+        }),
+      });
+
+      if (res.ok) {
+        const fullApp = await this.getApplicationById(params.applicationId);
+        if (fullApp) return fullApp;
+      }
+    } catch {}
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     const appIndex = applicationsState.findIndex((a) => a.id === params.applicationId);
     if (appIndex === -1) {

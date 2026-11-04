@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
   // Set auth cookie
   response.cookies.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: false,
+    httpOnly: true,
     path: '/',
     sameSite: 'lax',
     maxAge: 7 * 24 * 3600, // 7 days

@@ -79,7 +79,7 @@ export const jobsService = {
 
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json.data) && json.data.length > 0) {
+        if (Array.isArray(json.data)) {
           const fetchedJobs = json.data.map(mapPrismaJobToDomain);
 
           // Apply client-side sorting if specified

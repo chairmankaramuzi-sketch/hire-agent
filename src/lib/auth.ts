@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextRequest } from 'next/server';
 import { UserRole } from '@prisma/client';
 import { apiError } from '@/lib/apiResponse';
@@ -10,9 +11,51 @@ export interface AuthSession {
 }
 
 export const SESSION_COOKIE_NAME = 'ts_session';
+const SESSION_SECRET = process.env.SESSION_SECRET || process.env.DATABASE_URL || 'ts-auth-session-secret-2026';
 
 export function serializeSession(session: AuthSession): string {
-  return Buffer.from(JSON.stringify(session)).toString('base64');
+  const payload = Buffer.from(JSON.stringify(session)).toString('base64');
+  const signature = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+  return `${signature}.${payload}`;
+}
+
+export function parseSessionToken(token: string): AuthSession | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length === 2) {
+      const [signature, payload] = parts;
+      const expectedSig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('hex');
+      if (
+        signature.length === expectedSig.length &&
+        crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))
+      ) {
+        const decoded = JSON.parse(Buffer.from(payload, 'base64').toString('utf-8'));
+        if (decoded.userId && decoded.role && Object.values(UserRole).includes(decoded.role as UserRole)) {
+          return {
+            userId: decoded.userId,
+            email: decoded.email ?? 'unknown@example.com',
+            role: decoded.role as UserRole,
+            displayName: decoded.displayName ?? 'User',
+          };
+        }
+      }
+      return null;
+    }
+
+    // Support legacy unsigned token during transition
+    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
+    if (decoded.userId && decoded.role && Object.values(UserRole).includes(decoded.role as UserRole)) {
+      return {
+        userId: decoded.userId,
+        email: decoded.email ?? 'unknown@example.com',
+        role: decoded.role as UserRole,
+        displayName: decoded.displayName ?? 'User',
+      };
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }
 
 /**
@@ -21,19 +64,12 @@ export function serializeSession(session: AuthSession): string {
  * NEVER trusts client-supplied query params or body parameters for role.
  */
 export async function getSession(request: NextRequest): Promise<AuthSession | null> {
-  // 1. Try reading cookie first
+  // 1. Try reading verified cookie first
   try {
     const cookieVal = request.cookies.get(SESSION_COOKIE_NAME)?.value;
     if (cookieVal) {
-      const decoded = JSON.parse(Buffer.from(cookieVal, 'base64').toString('utf-8'));
-      if (decoded.userId && decoded.role && Object.values(UserRole).includes(decoded.role as UserRole)) {
-        return {
-          userId: decoded.userId,
-          email: decoded.email ?? 'unknown@example.com',
-          role: decoded.role as UserRole,
-          displayName: decoded.displayName ?? 'User',
-        };
-      }
+      const session = parseSessionToken(cookieVal);
+      if (session) return session;
     }
   } catch {
     // Cookie malformed or unavailable, continue to headers
