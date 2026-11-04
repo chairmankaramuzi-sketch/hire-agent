@@ -145,8 +145,9 @@ export async function seedUsers() {
   await prisma.$transaction(
     rows.map(r =>
       prisma.appUser.upsert({
-        where: { email: r.email },
+        where: { id: r.id },
         update: {
+          email: r.email,
           username: r.username,
           passwordHash: r.passwordHash,
           displayName: r.displayName,
@@ -605,7 +606,7 @@ export async function ingestCandidates(
     where: { email: { in: emails } },
     select: { id: true, email: true },
   });
-  const userIdByEmail = new Map(applicantUsers.map(u => [u.email.toLowerCase(), u.id]));
+  const userIdByEmail = new Map<string, string>(applicantUsers.map((u: any) => [u.email.toLowerCase(), u.id]));
 
   // Write CV files to private storage in parallel (local disk / tmp – fast)
   const stored = await Promise.all(
