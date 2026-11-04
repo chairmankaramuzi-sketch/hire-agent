@@ -8,8 +8,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   RefreshCw,
-  Clock,
-  ShieldAlert,
   Download,
   Sparkles,
 } from 'lucide-react';
@@ -228,19 +226,19 @@ export function CvUploadPrototypeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4">
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm p-4 transition-colors">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh] transition-colors">
         {/* Modal Header */}
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Upload Candidate CVs</h2>
-            <p className="text-xs text-slate-500">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Upload Candidate CVs</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Upload single CVs or a combined multi-candidate dossier for AI extraction and screening.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -248,13 +246,13 @@ export function CvUploadPrototypeModal({
 
         <div className="p-6 overflow-y-auto space-y-5 flex-1">
           {/* Combined 30 CVs Dossier Feature Banner */}
-          <div className="p-4 rounded-xl bg-indigo-50/70 border border-indigo-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors">
             <div className="space-y-1">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-indigo-950">
-                <Sparkles className="w-4 h-4 text-indigo-600" />
+              <div className="flex items-center gap-1.5 font-bold text-xs text-indigo-950 dark:text-indigo-300">
+                <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 Combined 30-Candidate Test Dossier Available
               </div>
-              <p className="text-[11px] text-indigo-700 leading-tight">
+              <p className="text-[11px] text-indigo-700 dark:text-indigo-300/80 leading-tight">
                 Single master document containing 30 realistic candidate profiles to test end-to-end AI screening.
               </p>
             </div>
@@ -263,7 +261,7 @@ export function CvUploadPrototypeModal({
               <a
                 href="/sample_docs/Combined_30_Candidates_Dossier.txt"
                 download="Combined_30_Candidates_Dossier.txt"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 shadow-sm transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-slate-700 shadow-sm transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
                 Download Dossier (.txt)
@@ -273,7 +271,7 @@ export function CvUploadPrototypeModal({
                 type="button"
                 disabled={batchIngesting}
                 onClick={handleIngest30Batch}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors disabled:opacity-50"
               >
                 {batchIngesting ? (
                   <>
@@ -291,12 +289,12 @@ export function CvUploadPrototypeModal({
           </div>
 
           {/* Dropzone */}
-          <label className="border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer bg-slate-50/50 hover:bg-indigo-50/20 transition-all text-center">
+          <label className="border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer bg-slate-50/50 dark:bg-slate-800/40 hover:bg-indigo-50/20 dark:hover:bg-indigo-950/20 transition-all text-center">
             <UploadCloud className="w-10 h-10 text-indigo-500 mb-2" />
-            <span className="text-sm font-semibold text-slate-800">
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               Click to select or drag and drop CV files
             </span>
-            <span className="text-xs text-slate-500 mt-1">
+            <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Supports .pdf, .docx, and combined .txt dossiers (max 15MB)
             </span>
             <input
@@ -311,21 +309,21 @@ export function CvUploadPrototypeModal({
           {/* Selected File List */}
           {selectedFiles.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+              <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
                 Files Ready for Intake ({selectedFiles.length})
               </h3>
 
-              <div className="divide-y divide-slate-100 border border-slate-200 rounded-lg max-h-56 overflow-y-auto">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 border border-slate-200 dark:border-slate-800 rounded-xl max-h-56 overflow-y-auto">
                 {selectedFiles.map((item) => (
-                  <div key={item.id} className="p-3 flex items-center justify-between text-sm bg-white">
+                  <div key={item.id} className="p-3 flex items-center justify-between text-sm bg-white dark:bg-slate-800/60">
                     <div className="flex items-center gap-3 min-w-0">
-                      <FileText className={`w-4 h-4 shrink-0 ${item.isValid ? 'text-indigo-600' : 'text-rose-500'}`} />
+                      <FileText className={`w-4 h-4 shrink-0 ${item.isValid ? 'text-indigo-600 dark:text-indigo-400' : 'text-rose-500'}`} />
                       <div className="min-w-0">
-                        <p className="font-medium text-slate-900 truncate">{item.name}</p>
+                        <p className="font-medium text-slate-900 dark:text-white truncate">{item.name}</p>
                         <p className="text-xs text-slate-400">
                           {formatSize(item.size)}
                           {item.validationError && (
-                            <span className="text-rose-600 font-medium ml-2">{item.validationError}</span>
+                            <span className="text-rose-600 dark:text-rose-400 font-medium ml-2">{item.validationError}</span>
                           )}
                         </p>
                       </div>
@@ -334,7 +332,7 @@ export function CvUploadPrototypeModal({
                     <button
                       type="button"
                       onClick={() => removeFile(item.id)}
-                      className="text-slate-400 hover:text-rose-600 p-1"
+                      className="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -346,30 +344,30 @@ export function CvUploadPrototypeModal({
 
           {/* Error Feedback Banner */}
           {errorMessage && (
-            <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 space-y-1.5 text-xs">
-              <div className="flex items-center gap-2 font-semibold text-rose-900">
-                <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 space-y-1.5 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-rose-900 dark:text-rose-300">
+                <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
                 Intake & Upload Error
               </div>
-              <p className="text-rose-700 leading-relaxed">{errorMessage}</p>
+              <p className="text-rose-700 dark:text-rose-300 leading-relaxed">{errorMessage}</p>
             </div>
           )}
 
           {/* Result Feedback Banner */}
           {results && (
-            <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200 space-y-2.5 text-xs">
-              <div className="flex items-center gap-2 font-semibold text-emerald-900">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 space-y-2.5 text-xs">
+              <div className="flex items-center gap-2 font-semibold text-emerald-900 dark:text-emerald-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 Intake & AI Screening Pipeline Complete
               </div>
-              <p className="text-emerald-800 leading-relaxed">
+              <p className="text-emerald-800 dark:text-emerald-300 leading-relaxed">
                 {results.message || `Processed ${results.succeeded.length} application records into the decision system.`}
               </p>
               <div>
                 <button
                   type="button"
                   onClick={onClose}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold text-xs text-white bg-emerald-600 hover:bg-emerald-700 shadow-sm transition-colors"
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   View Screened Candidates
@@ -380,8 +378,8 @@ export function CvUploadPrototypeModal({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-5 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
-          <span className="text-xs text-slate-500">
+        <div className="p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+          <span className="text-xs text-slate-500 dark:text-slate-400">
             {results ? 'Screening complete' : `${selectedFiles.filter((f) => f.isValid).length} valid documents selected`}
           </span>
 
@@ -389,7 +387,7 @@ export function CvUploadPrototypeModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-md hover:bg-slate-50"
+              className="px-4 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
             >
               {results ? 'Close' : 'Cancel'}
             </button>
@@ -397,7 +395,7 @@ export function CvUploadPrototypeModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-md shadow-sm transition-colors flex items-center gap-2"
+                className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-colors flex items-center gap-2"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 View Candidates
@@ -407,7 +405,7 @@ export function CvUploadPrototypeModal({
                 type="button"
                 disabled={uploading || selectedFiles.filter((f) => f.isValid).length === 0}
                 onClick={handleSubmit}
-                className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {uploading ? (
                   <>
