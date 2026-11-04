@@ -107,11 +107,27 @@ export class LocalPrivateStorageService implements IStorageService {
   }
 
   async generateSignedUrl(storageKey: string, expiresInSeconds = 300): Promise<string> {
-    const token = crypto.randomBytes(24).toString('hex');
     const expiresAt = Date.now() + expiresInSeconds * 1000;
+    const token = generateDownloadToken(storageKey, expiresAt);
     // Generated access token URL that goes through authorized server download route
     return `/api/v1/cv-download?key=${encodeURIComponent(storageKey)}&token=${token}&expires=${expiresAt}`;
   }
+}
+
+export function generateDownloadToken(storageKey: string, expiresAt: number): string {
+  const secret = process.env.SESSION_SECRET || process.env.DATABASE_URL || 'ts-cv-download-secret-key-2026';
+  return crypto.createHmac('sha256', secret).update(`${storageKey}:${expiresAt}`).digest('hex');
+}
+
+export function verifyDownloadToken(storageKey: string, expiresAt: number, token: string): boolean {
+  if (!token || isNaN(expiresAt) || Date.now() > expiresAt) {
+    return false;
+  }
+  const expected = generateDownloadToken(storageKey, expiresAt);
+  if (expected.length !== token.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(token));
 }
 
 export const storageService: IStorageService = new LocalPrivateStorageService();

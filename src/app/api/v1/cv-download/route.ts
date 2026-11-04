@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { storageService } from '@/lib/storage';
+import { storageService, verifyDownloadToken } from '@/lib/storage';
 import { apiError, generateRequestId } from '@/lib/apiResponse';
 
 export async function GET(request: NextRequest) {
@@ -10,13 +10,14 @@ export async function GET(request: NextRequest) {
   const token = url.searchParams.get('token');
   const expires = url.searchParams.get('expires');
 
-  // Verify signed token presence and expiration
-  if (!token || !expires || Date.now() > Number(expires)) {
-    return apiError('UNAUTHORIZED', 'Invalid or expired download token', 401, requestId);
-  }
-
   if (!key) {
     return apiError('BAD_REQUEST', 'Missing storage key parameter', 400, requestId);
+  }
+
+  const expiresNum = Number(expires);
+  // Cryptographically verify signed HMAC token and expiration
+  if (!token || !expires || isNaN(expiresNum) || !verifyDownloadToken(key, expiresNum, token)) {
+    return apiError('UNAUTHORIZED', 'Invalid or expired download token', 401, requestId);
   }
 
   const cvAsset = await prisma.cvAsset.findUnique({

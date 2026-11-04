@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
+import { UserRole } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { storageService } from '@/lib/storage';
+import { storageService, verifyDownloadToken } from '@/lib/storage';
+import { getSession, requireRole, canAccessApplication } from '@/lib/auth';
 import { apiSuccess, apiError, generateRequestId } from '@/lib/apiResponse';
 import { recordAuditEvent } from '@/lib/audit';
 
@@ -13,17 +15,18 @@ export async function GET(
   const token = url.searchParams.get('token');
   const expires = url.searchParams.get('expires');
 
-  // Verify signed token presence and expiration
-  if (!token || !expires || Date.now() > Number(expires)) {
-    return apiError('UNAUTHORIZED', 'Invalid or expired download token', 401, requestId);
-  }
-
   const cvAsset = await prisma.cvAsset.findUnique({
     where: { applicationId: params.applicationId },
   });
 
   if (!cvAsset) {
     return apiError('NOT_FOUND', 'CV file not found', 404, requestId);
+  }
+
+  const expiresNum = Number(expires);
+  // Cryptographically verify signed HMAC token and expiration
+  if (!token || !expires || isNaN(expiresNum) || !verifyDownloadToken(cvAsset.storageKey, expiresNum, token)) {
+    return apiError('UNAUTHORIZED', 'Invalid or expired download token', 401, requestId);
   }
 
   const buffer = await storageService.getFile(cvAsset.storageKey);
@@ -51,6 +54,10 @@ export async function DELETE(
   { params }: { params: { applicationId: string } }
 ) {
   const requestId = request.headers.get('x-request-id') ?? generateRequestId();
+  const session = await getSession(request);
+
+  const authError = requireRole([UserRole.HR, UserRole.ADMIN, UserRole.APPLICANT], session, requestId);
+  if (authError) return authError;
 
   const application = await prisma.application.findUnique({
     where: { id: params.applicationId },
@@ -59,6 +66,10 @@ export async function DELETE(
 
   if (!application) {
     return apiError('NOT_FOUND', 'Application not found', 404, requestId);
+  }
+
+  if (!canAccessApplication(session!, application)) {
+    return apiError('FORBIDDEN', 'Insufficient permissions to delete this application', 403, requestId);
   }
 
   // Delete physical storage asset
@@ -72,6 +83,7 @@ export async function DELETE(
   });
 
   await recordAuditEvent({
+    actorUserId: session!.userId,
     action: 'APPLICATION_DELETED',
     resourceType: 'APPLICATION',
     resourceId: params.applicationId,

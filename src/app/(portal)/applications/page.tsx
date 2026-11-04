@@ -133,7 +133,7 @@ export default function AllApplicationsPage() {
                       <div className="font-semibold text-slate-900">{app.applicant.fullName}</div>
                       <div className="text-xs text-slate-500">{app.applicant.email}</div>
                     </td>
-                    <td className="px-6 py-4 text-xs font-medium text-slate-700">{app.jobId}</td>
+                    <td className="px-6 py-4 text-xs font-medium text-slate-700">{app.jobTitle || app.jobId}</td>
                     <td className="px-6 py-4 text-xs">
                       {app.screeningRun?.mandatoryStatus ?? 'N/A'}
                     </td>
