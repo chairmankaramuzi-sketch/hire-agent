@@ -39,21 +39,24 @@ export async function POST(request: NextRequest) {
   ].includes(rawUsername);
 
   // Look up by email, username, or admin alias in database
+  const orConditions: any[] = [
+    { email: { equals: rawUsername, mode: 'insensitive' } },
+    { username: { equals: rawUsername, mode: 'insensitive' } },
+  ];
+
+  if (isAdminAlias) {
+    orConditions.push(
+      { email: { equals: 'karamuzi@company.com', mode: 'insensitive' } },
+      { email: { equals: 'admin@company.com', mode: 'insensitive' } },
+      { username: { equals: 'karamuzi', mode: 'insensitive' } },
+      { username: { equals: 'admin', mode: 'insensitive' } },
+      { displayName: { contains: 'Karamuzi', mode: 'insensitive' } }
+    );
+  }
+
   let matchedUser: any = await prisma.appUser.findFirst({
     where: {
-      OR: [
-        { email: { equals: rawUsername, mode: 'insensitive' } },
-        { username: { equals: rawUsername, mode: 'insensitive' } },
-        ...(isAdminAlias
-          ? [
-              { email: { equals: 'karamuzi@company.com', mode: 'insensitive' } },
-              { email: { equals: 'admin@company.com', mode: 'insensitive' } },
-              { username: { equals: 'karamuzi', mode: 'insensitive' } },
-              { username: { equals: 'admin', mode: 'insensitive' } },
-              { displayName: { contains: 'Karamuzi', mode: 'insensitive' } },
-            ]
-          : []),
-      ],
+      OR: orConditions,
     },
   }).catch(() => null);
 
