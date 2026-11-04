@@ -18,7 +18,6 @@ import {
   Download,
   ShieldAlert,
   RefreshCw,
-  FileText,
   UserCog,
   Eye,
   EyeOff,
@@ -26,12 +25,10 @@ import {
   LayoutGrid,
   List,
   Search,
-  Filter,
   Check,
   X,
   Zap,
   TrendingUp,
-  Award,
 } from 'lucide-react';
 import { applicationsService, jobsService, systemService } from '@/services';
 import type { SystemCounts } from '@/services/system';
@@ -126,6 +123,8 @@ export default function DashboardPage() {
     try {
       await applicationsService.addReviewDecision({
         applicationId,
+        reviewerId: currentUser.id || 'usr-hr-001',
+        reviewerName: currentUser.name || 'Jane Doe',
         decision,
         reason: decision === 'SHORTLIST' ? 'Shortlisted via Hybrid Kanban Board' : 'Rejected via Hybrid Kanban Board',
       });
@@ -258,14 +257,14 @@ export default function DashboardPage() {
             type="button"
             onClick={() => handleAction('seed-users')}
             disabled={dangerLoading !== null}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-semibold text-xs shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 font-semibold text-xs shadow-sm transition-colors"
           >
             <UserCog className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             {dangerLoading === 'seed-users' ? 'Restoring Users...' : 'Restore Test Users'}
           </button>
           <a
             href="#danger-zone"
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 font-semibold text-xs shadow-xs transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/50 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-800 dark:text-rose-300 border border-rose-300 dark:border-rose-800 font-semibold text-xs shadow-sm transition-colors"
           >
             <ShieldAlert className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
             Testing & Danger Zone
@@ -447,7 +446,7 @@ export default function DashboardPage() {
               onClick={() => setViewMode('table')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'table'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -459,7 +458,7 @@ export default function DashboardPage() {
               onClick={() => setViewMode('kanban')}
               className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'kanban'
-                  ? 'bg-indigo-600 text-white shadow-xs'
+                  ? 'bg-indigo-600 text-white shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -647,7 +646,7 @@ export default function DashboardPage() {
                         return (
                           <tr
                             key={app.id}
-                            className="hover:bg-slate-50/60 dark:hover:bg-slate-850/50 transition-colors"
+                            className="hover:bg-slate-50/60 dark:hover:bg-slate-800/50 transition-colors"
                           >
                             <td className="px-5 py-3.5">
                               <div className="flex items-center gap-3">
@@ -782,7 +781,7 @@ export default function DashboardPage() {
                   kanbanStages.incoming.map((app) => (
                     <div
                       key={app.id}
-                      className="bg-white dark:bg-slate-850 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all"
+                      className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <span className="font-semibold text-xs text-slate-900 dark:text-white">
@@ -827,7 +826,7 @@ export default function DashboardPage() {
                   kanbanStages.needsReview.map((app) => (
                     <div
                       key={app.id}
-                      className="bg-white dark:bg-slate-850 p-3.5 rounded-xl border border-amber-200/80 dark:border-amber-800/60 shadow-xs transition-all"
+                      className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-amber-200/80 dark:border-amber-800/60 shadow-sm transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <span className="font-semibold text-xs text-slate-900 dark:text-white">
@@ -894,7 +893,7 @@ export default function DashboardPage() {
                   kanbanStages.eligible.map((app) => (
                     <div
                       key={app.id}
-                      className="bg-white dark:bg-slate-850 p-3.5 rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 shadow-xs transition-all"
+                      className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-indigo-200/80 dark:border-indigo-800/60 shadow-sm transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <span className="font-semibold text-xs text-slate-900 dark:text-white">
@@ -942,7 +941,7 @@ export default function DashboardPage() {
                   kanbanStages.interview.map((app) => (
                     <div
                       key={app.id}
-                      className="bg-white dark:bg-slate-850 p-3.5 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 shadow-xs transition-all"
+                      className="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-emerald-200/80 dark:border-emerald-800/60 shadow-sm transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <span className="font-semibold text-xs text-slate-900 dark:text-white">
@@ -1048,7 +1047,7 @@ export default function DashboardPage() {
 
           {/* Live Database Counts Bar */}
           {systemCounts && (
-            <div className="px-5 py-3 bg-slate-50/80 dark:bg-slate-850/50 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400 flex-wrap">
+            <div className="px-5 py-3 bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400 flex-wrap">
               <span className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Database className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                 Live DB State:
@@ -1200,7 +1199,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Action 5: Remove Vacancies */}
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex flex-col justify-between space-y-3">
+            <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col justify-between space-y-3">
               <div>
                 <div className="flex items-center gap-2 font-bold text-xs text-slate-800 dark:text-slate-200">
                   <Briefcase className="w-4 h-4 text-slate-600 dark:text-slate-400" />
@@ -1232,7 +1231,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Test Accounts & Credentials Accordion */}
-          <div className="px-6 py-4 bg-slate-50/60 dark:bg-slate-850/60 border-t border-slate-100 dark:border-slate-800">
+          <div className="px-6 py-4 bg-slate-50/60 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <UserCog className="w-4 h-4 text-slate-500 dark:text-slate-400" />
@@ -1254,7 +1253,7 @@ export default function DashboardPage() {
               {staffAccounts.map((account) => (
                 <div
                   key={account.id}
-                  className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex flex-col justify-between shadow-2xs"
+                  className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex flex-col justify-between shadow-sm"
                 >
                   <div>
                     <div className="font-semibold text-slate-900 dark:text-white flex items-center justify-between">
@@ -1285,7 +1284,7 @@ export default function DashboardPage() {
           CONFIRMATION MODAL
       ========================================================================= */}
       {confirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 border border-rose-200 dark:border-rose-800">
