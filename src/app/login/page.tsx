@@ -25,7 +25,7 @@ export default function LoginPage() {
   const router = useRouter();
   const defaultStaff = staffAccounts[1]; // Jane Doe - HR Director
   const [username, setUsername] = useState(defaultStaff?.email ?? 'hr@company.com');
-  const [password, setPassword] = useState(defaultStaff?.password ?? 'HrDirector@2026');
+  const [password, setPassword] = useState(process.env.NODE_ENV === 'production' ? '' : defaultStaff?.password ?? '');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

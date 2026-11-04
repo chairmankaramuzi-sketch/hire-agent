@@ -70,34 +70,45 @@ export function evaluateScreening(
     const key = criterion.name.toLowerCase();
     const keyNorm = normalize(criterion.name);
 
-    // Match evidence by fieldKey, substring, token overlap, or semantic category
+    const stopWords = new Set(['the', 'and', 'for', 'with', 'a', 'an', 'in', 'of', 'at', 'to', 'by', 'on', 'is']);
+    const getWords = (str: string) => str.split(' ').filter(w => w.length > 2 && !stopWords.has(w));
+    const criterionWords = getWords(keyNorm);
+
+    // Match evidence by fieldKey, token overlap, or category fallbacks
     const matchedEvidence =
+      evidenceMap.get(criterion.id.toLowerCase()) ||
       evidenceMap.get(key) ||
       evidenceMap.get(keyNorm) ||
       Array.from(evidenceMap.values()).find(e => {
         const evKeyNorm = normalize(e.fieldKey);
         if (evKeyNorm === keyNorm) return true;
-        if (keyNorm.includes(evKeyNorm) || evKeyNorm.includes(keyNorm)) return true;
-        // Degree / Education
+
+        // Substring match with minimum length threshold to avoid false positives on short words
+        if (evKeyNorm.length >= 4 && keyNorm.length >= 4) {
+          if (keyNorm.includes(evKeyNorm) || evKeyNorm.includes(keyNorm)) return true;
+        }
+
+        // Token overlap: count shared significant words
+        const evWords = getWords(evKeyNorm);
+        if (criterionWords.length > 0 && evWords.length > 0) {
+          const overlap = criterionWords.filter(w => evWords.includes(w));
+          if (overlap.length >= 2 || (overlap.length === 1 && criterionWords.length === 1)) {
+            return true;
+          }
+        }
+
+        // Education / Degree fallbacks
         if (
-          (keyNorm.includes('degree') || keyNorm.includes('education')) &&
-          (evKeyNorm.includes('degree') || evKeyNorm.includes('education'))
+          (keyNorm.includes('degree') || keyNorm.includes('education') || keyNorm.includes('qualification')) &&
+          (evKeyNorm.includes('degree') || evKeyNorm.includes('education') || evKeyNorm.includes('qualification'))
         ) return true;
-        // Experience / Tenure
+
+        // Experience / Tenure fallbacks
         if (
-          (keyNorm.includes('experience') || keyNorm.includes('year') || keyNorm.includes('tenure')) &&
-          (evKeyNorm.includes('experience') || evKeyNorm.includes('year') || evKeyNorm.includes('tenure'))
+          (keyNorm.includes('experience') || keyNorm.includes('tenure') || keyNorm.includes('years')) &&
+          (evKeyNorm.includes('experience') || evKeyNorm.includes('tenure') || evKeyNorm.includes('years'))
         ) return true;
-        // Web Stack / TypeScript / React / Node
-        if (
-          (keyNorm.includes('stack') || keyNorm.includes('typescript') || keyNorm.includes('react') || keyNorm.includes('web')) &&
-          (evKeyNorm.includes('stack') || evKeyNorm.includes('web') || evKeyNorm.includes('skill') || evKeyNorm.includes('typescript') || evKeyNorm.includes('react'))
-        ) return true;
-        // Testing / Database / Quality / Postgres
-        if (
-          (keyNorm.includes('test') || keyNorm.includes('database') || keyNorm.includes('quality') || keyNorm.includes('sql') || keyNorm.includes('postgres')) &&
-          (evKeyNorm.includes('test') || evKeyNorm.includes('database') || evKeyNorm.includes('quality') || evKeyNorm.includes('sql') || evKeyNorm.includes('postgres'))
-        ) return true;
+
         return false;
       });
 

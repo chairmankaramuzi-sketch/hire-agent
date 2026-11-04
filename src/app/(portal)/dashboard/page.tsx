@@ -27,10 +27,12 @@ import {
 import { applicationsService, jobsService, systemService } from '@/services';
 import type { SystemCounts } from '@/services/system';
 import { staffAccounts, APPLICANT_SEED_PASSWORD } from '@/lib/data/staffAccounts';
-import { DashboardMetrics, Job, Application } from '@/types';
+import { authService, activeUser } from '@/services/auth';
+import { DashboardMetrics, Job, Application, User } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 
 export default function DashboardPage() {
+  const [currentUser, setCurrentUser] = useState<User>(activeUser);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [recentApplications, setRecentApplications] = useState<Application[]>([]);
@@ -76,6 +78,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     loadData();
+    authService.getCurrentUser().then(setCurrentUser);
   }, [loadData]);
 
   const handleAction = async (action: DangerAction) => {
@@ -348,7 +351,8 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* DANGER ZONE & SYSTEM INITIALIZATION */}
+      {/* DANGER ZONE & SYSTEM INITIALIZATION (Admin Only) */}
+      {currentUser.role === 'ADMIN' && (
       <div id="danger-zone" className="bg-white rounded-xl border border-rose-200 shadow-sm overflow-hidden scroll-mt-6">
         <div className="p-5 bg-gradient-to-r from-rose-50/80 via-white to-amber-50/40 border-b border-rose-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -614,6 +618,7 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Confirmation Modal */}
       {confirmModal && (

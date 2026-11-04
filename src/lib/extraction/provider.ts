@@ -1,8 +1,48 @@
+import zlib from 'zlib';
 import { GoogleGenAI } from '@google/genai';
 import { ExtractionOutput, extractionOutputSchema } from './schema';
 import { CriterionResult } from '@prisma/client';
 import { getEnv } from '@/lib/env';
 import { logger } from '@/lib/logger';
+
+function extractTextFromDocx(buffer: Buffer): string {
+  try {
+    let offset = 0;
+    while (offset < buffer.length - 4) {
+      if (buffer.readUInt32LE(offset) === 0x04034b50) {
+        const compMethod = buffer.readUInt16LE(offset + 8);
+        const compSize = buffer.readUInt32LE(offset + 18);
+        const fnLen = buffer.readUInt16LE(offset + 26);
+        const extraLen = buffer.readUInt16LE(offset + 28);
+        const filename = buffer.toString('utf-8', offset + 30, offset + 30 + fnLen);
+        const dataStart = offset + 30 + fnLen + extraLen;
+
+        if (filename === 'word/document.xml') {
+          const compData = buffer.subarray(dataStart, dataStart + compSize);
+          const xml =
+            compMethod === 8
+              ? zlib.inflateRawSync(compData).toString('utf-8')
+              : compData.toString('utf-8');
+          return xml
+            .replace(/<\/w:p>/g, '\n')
+            .replace(/<w:tab\/>/g, '\t')
+            .replace(/<[^>]+>/g, '')
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&apos;/g, "'")
+            .replace(/\n\s*\n/g, '\n')
+            .trim();
+        }
+        offset = dataStart + compSize;
+      } else {
+        offset++;
+      }
+    }
+  } catch {}
+  return buffer.toString('utf-8').replace(/[^\x20-\x7E\n\r\t]/g, ' ').trim();
+}
 
 export interface ExtractionRequest {
   documentBuffer: Buffer;
@@ -58,22 +98,34 @@ Rules:
 3. NEVER infer or output protected demographic characteristics (race, gender, age, religion, ethnicity, photos).
 4. Output strict JSON matching the requested structure only.`;
 
-    const base64Data = request.documentBuffer.toString('base64');
+    const isDocx =
+      request.mimeType.includes('word') ||
+      request.mimeType.includes('officedocument') ||
+      request.mimeType === 'application/msword';
+    const isText = request.mimeType.startsWith('text/');
+
+    const contentParts: any[] = [{ text: systemPrompt }];
+
+    if (isDocx) {
+      const docxText = extractTextFromDocx(request.documentBuffer);
+      contentParts.push({ text: `Resume Content (Extracted from Word Document):\n\n${docxText}` });
+    } else if (isText) {
+      contentParts.push({ text: `Resume Content:\n\n${request.documentBuffer.toString('utf-8')}` });
+    } else {
+      contentParts.push({
+        inlineData: {
+          mimeType: request.mimeType || 'application/pdf',
+          data: request.documentBuffer.toString('base64'),
+        },
+      });
+    }
 
     const response = await this.ai.models.generateContent({
       model,
       contents: [
         {
           role: 'user',
-          parts: [
-            { text: systemPrompt },
-            {
-              inlineData: {
-                mimeType: request.mimeType,
-                data: base64Data,
-              },
-            },
-          ],
+          parts: contentParts,
         },
       ],
       config: {
