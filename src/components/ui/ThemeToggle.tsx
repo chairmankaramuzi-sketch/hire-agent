@@ -12,7 +12,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       type="button"
       id="theme-toggle-btn"
       onClick={toggleTheme}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border shadow-xs ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border shadow-sm ${
         theme === 'dark'
           ? 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700 hover:border-slate-600'
           : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300 hover:border-slate-400'
