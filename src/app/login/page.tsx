@@ -119,7 +119,9 @@ export default function LoginPage() {
         <ThemeToggle />
       </div>
 
-      <div className="w-full max-w-sm sm:max-w-md space-y-6">
+      {/* Main Bordered Login Card Container */}
+      <div className="w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl shadow-slate-200/50 dark:shadow-2xl dark:shadow-black/50 space-y-6 transition-colors">
+        
         {/* Startup Logo & Title */}
         <div className="text-center space-y-2.5">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-xl shadow-indigo-600/30 text-white mx-auto">
@@ -163,7 +165,7 @@ export default function LoginPage() {
                   className={`p-2.5 rounded-xl text-left transition-all ${
                     isSelected
                       ? 'bg-indigo-50 dark:bg-indigo-500/20 border-2 border-indigo-600 dark:border-indigo-500 shadow-sm'
-                      : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
+                      : 'bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-600'
                   }`}
                 >
                   <span className="text-xs font-bold text-slate-900 dark:text-white block truncate">
@@ -186,7 +188,7 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Login Form */}
+        {/* Login Form with Defined Borders */}
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
             <label
@@ -202,7 +204,7 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => handleInputChange(e.target.value)}
               placeholder="e.g. MR. KALAMUZI"
-              className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+              className="w-full bg-slate-50 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             />
           </div>
 
@@ -230,7 +232,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-12 font-mono"
+                className="w-full bg-slate-50 dark:bg-slate-950/60 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all pr-12 font-mono"
               />
               <button
                 type="button"
@@ -262,8 +264,8 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Footer */}
-        <div className="text-center pt-2 space-y-2">
+        {/* Footer & Border Divider */}
+        <div className="text-center pt-2 space-y-2 border-t border-slate-100 dark:border-slate-800/80">
           <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">
             TalentScreen Cloud • Enterprise Edition
           </p>
