@@ -517,10 +517,10 @@ export default function ApplicationDetailPage({
             </form>
           </div>
 
-          {/* Candidate's Resume File Card */}
+          {/* Candidate Resume File Card */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-3 transition-colors">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Candidate's Resume File
+              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Candidate Resume File
             </h3>
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 rounded-xl text-xs space-y-3">
               <div>

@@ -142,22 +142,39 @@ export async function purgeJobs() {
 export async function seedUsers() {
   const rows = await buildUserRows(allSeedUsers);
 
-  await prisma.$transaction(
-    rows.map(r =>
-      prisma.appUser.upsert({
-        where: { id: r.id },
-        update: {
-          email: r.email,
-          username: r.username,
-          passwordHash: r.passwordHash,
-          displayName: r.displayName,
-          jobTitle: r.jobTitle,
-          role: r.role,
+  for (const r of rows) {
+    try {
+      const existing = await prisma.appUser.findFirst({
+        where: {
+          OR: [
+            { id: r.id },
+            { email: { equals: r.email, mode: 'insensitive' } },
+            r.username ? { username: { equals: r.username, mode: 'insensitive' } } : {},
+          ],
         },
-        create: r,
-      })
-    )
-  );
+      });
+
+      if (existing) {
+        await prisma.appUser.update({
+          where: { id: existing.id },
+          data: {
+            email: r.email,
+            username: r.username,
+            passwordHash: r.passwordHash,
+            displayName: r.displayName,
+            jobTitle: r.jobTitle,
+            role: r.role,
+          },
+        });
+      } else {
+        await prisma.appUser.create({
+          data: r,
+        });
+      }
+    } catch (e) {
+      console.warn('[seedUsers] safe seed note for ' + r.id + ':', e);
+    }
+  }
 
   return { staff: seedStaffUsers.length, applicants: rows.length - seedStaffUsers.length, total: rows.length };
 }

@@ -64,16 +64,24 @@ export async function PATCH(
 
   // Ensure user exists and save review audit note
   await prisma.$transaction(async tx => {
-    await tx.appUser.upsert({
-      where: { id: session!.userId },
-      update: {},
-      create: {
-        id: session!.userId,
-        email: session!.email,
-        displayName: session!.displayName,
-        role: session!.role,
+    const existingReviewer = await tx.appUser.findFirst({
+      where: {
+        OR: [
+          { id: session!.userId },
+          { email: { equals: session!.email, mode: 'insensitive' } },
+        ],
       },
     });
+    if (!existingReviewer) {
+      await tx.appUser.create({
+        data: {
+          id: session!.userId,
+          email: session!.email,
+          displayName: session!.displayName,
+          role: session!.role,
+        },
+      }).catch(() => null);
+    }
 
     await tx.reviewNote.create({
       data: {

@@ -87,16 +87,24 @@ export async function POST(request: NextRequest) {
   // Create job and initial criteria version (v1)
   const job = await prisma.$transaction(async tx => {
     // Ensure creator user exists in DB or create placeholder
-    await tx.appUser.upsert({
-      where: { id: session!.userId },
-      update: {},
-      create: {
-        id: session!.userId,
-        email: session!.email,
-        displayName: session!.displayName,
-        role: session!.role,
+    const existingCreator = await tx.appUser.findFirst({
+      where: {
+        OR: [
+          { id: session!.userId },
+          { email: { equals: session!.email, mode: 'insensitive' } },
+        ],
       },
     });
+    if (!existingCreator) {
+      await tx.appUser.create({
+        data: {
+          id: session!.userId,
+          email: session!.email,
+          displayName: session!.displayName,
+          role: session!.role,
+        },
+      }).catch(() => null);
+    }
 
     const createdJob = await tx.job.create({
       data: {

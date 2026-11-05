@@ -36,16 +36,24 @@ export async function POST(
   }
 
   // Ensure author user exists
-  await prisma.appUser.upsert({
-    where: { id: session!.userId },
-    update: {},
-    create: {
-      id: session!.userId,
-      email: session!.email,
-      displayName: session!.displayName,
-      role: session!.role,
+  const existingAuthor = await prisma.appUser.findFirst({
+    where: {
+      OR: [
+        { id: session!.userId },
+        { email: { equals: session!.email, mode: 'insensitive' } },
+      ],
     },
   });
+  if (!existingAuthor) {
+    await prisma.appUser.create({
+      data: {
+        id: session!.userId,
+        email: session!.email,
+        displayName: session!.displayName,
+        role: session!.role,
+      },
+    }).catch(() => null);
+  }
 
   const note = await prisma.reviewNote.create({
     data: {

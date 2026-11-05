@@ -50,16 +50,24 @@ export async function POST(
 
   const result = await prisma.$transaction(async tx => {
     // Ensure decider user exists in DB
-    await tx.appUser.upsert({
-      where: { id: session!.userId },
-      update: {},
-      create: {
-        id: session!.userId,
-        email: session!.email,
-        displayName: session!.displayName,
-        role: session!.role,
+    const existingDecider = await tx.appUser.findFirst({
+      where: {
+        OR: [
+          { id: session!.userId },
+          { email: { equals: session!.email, mode: 'insensitive' } },
+        ],
       },
     });
+    if (!existingDecider) {
+      await tx.appUser.create({
+        data: {
+          id: session!.userId,
+          email: session!.email,
+          displayName: session!.displayName,
+          role: session!.role,
+        },
+      }).catch(() => null);
+    }
 
     const hrDecisionRecord = await tx.hrDecision.create({
       data: {
