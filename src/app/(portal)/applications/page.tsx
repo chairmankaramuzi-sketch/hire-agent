@@ -57,9 +57,9 @@ export default function AllApplicationsPage() {
     <div className="space-y-6 max-w-7xl mx-auto transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">All Candidate Applications</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Candidate Applications</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Global view across all active vacancies with exportable candidate reports.
+            View all job applicants in one place and download reports.
           </p>
         </div>
 
@@ -77,9 +77,9 @@ export default function AllApplicationsPage() {
           {(
             [
               { key: 'ALL', label: 'All' },
-              { key: 'ELIGIBLE', label: 'Eligible Shortlist' },
+              { key: 'ELIGIBLE', label: 'Qualified Candidates' },
               { key: 'NEEDS_REVIEW', label: 'Needs Review' },
-              { key: 'INELIGIBLE', label: 'Ineligible' },
+              { key: 'INELIGIBLE', label: 'Did Not Qualify' },
             ] as const
           ).map((tab) => (
             <button

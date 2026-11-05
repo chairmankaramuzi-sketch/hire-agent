@@ -18,9 +18,9 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/jobs', label: 'Job Vacancies', icon: Briefcase },
-  { href: '/applications', label: 'All Applications', icon: Users },
-  { href: '/settings', label: 'System & Retention', icon: Settings },
+  { href: '/jobs', label: 'Job Openings', icon: Briefcase },
+  { href: '/applications', label: 'Candidates', icon: Users },
+  { href: '/settings', label: 'System Settings', icon: Settings },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -47,10 +47,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="px-4 py-3 bg-amber-50/70 dark:bg-amber-950/30 border-b border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-900 dark:text-amber-200">
           <div className="flex items-center gap-1.5 font-medium mb-1">
             <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-            Decision-Support Mode
+            AI Assistant Mode
           </div>
           <p className="text-[11px] leading-tight text-amber-800/90 dark:text-amber-300/80">
-            Human-in-the-loop screening: AI assists fact extraction; HR makes final decisions.
+            AI helps review resumes. You make all final hiring decisions.
           </p>
         </div>
 
@@ -113,9 +113,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 sm:px-8">
           <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-            <span className="font-medium text-slate-900 dark:text-white">Enterprise HR Portal</span>
+            <span className="font-medium text-slate-900 dark:text-white">Recruitment Portal</span>
             <span>/</span>
-            <span>Recruitment & Hiring</span>
+            <span>Hiring Dashboard</span>
           </div>
 
           <div className="flex items-center gap-3">

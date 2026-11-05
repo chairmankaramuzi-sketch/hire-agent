@@ -36,9 +36,9 @@ export default function JobsListPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Job Vacancies</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Job Openings</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Manage job definitions, mandatory criteria, and scored evaluation criteria.
+            Manage your job openings, required qualifications, and candidate scoring rules.
           </p>
         </div>
         <Link
@@ -46,7 +46,7 @@ export default function JobsListPage() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm shadow-md shadow-indigo-600/20 transition-all"
         >
           <PlusCircle className="w-4 h-4" />
-          Create New Vacancy
+          Post a New Job
         </Link>
       </div>
 
@@ -81,11 +81,11 @@ export default function JobsListPage() {
 
       {/* Jobs Grid / List */}
       {loading ? (
-        <div className="p-12 text-center text-slate-500 dark:text-slate-400">Loading vacancies...</div>
+        <div className="p-12 text-center text-slate-500 dark:text-slate-400">Loading jobs...</div>
       ) : jobs.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center transition-colors">
           <Briefcase className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-          <h3 className="text-base font-semibold text-slate-900 dark:text-white">No vacancies found</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-white">No jobs found</h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
             Try adjusting your search filters or click below to create a new job opening.
           </p>
@@ -95,7 +95,7 @@ export default function JobsListPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 shadow-sm"
             >
               <PlusCircle className="w-4 h-4" />
-              Create Vacancy
+              Post a New Job
             </Link>
           </div>
         </div>

@@ -258,9 +258,9 @@ export default function ApplicationDetailPage({
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
               <div className="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Deterministic Screening Breakdown</h2>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Resume Screening Results</h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Job criteria results with evidence excerpts and extraction confidence.
+                    Detailed evaluation showing exact proof found in the resume.
                   </p>
                 </div>
                 <span className="text-xs font-medium px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
@@ -302,14 +302,14 @@ export default function ApplicationDetailPage({
                     {result.evidenceText && (
                       <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-100 dark:border-slate-700/60 text-xs">
                         <span className="font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                          CV Evidence Excerpt ({result.evidenceReference ?? 'Source document'}):
+                          Proof Found in Resume ({result.evidenceReference ?? 'Source document'}):
                         </span>
                         <blockquote className="italic text-slate-600 dark:text-slate-300 border-l-2 border-indigo-400 pl-2">
                           &ldquo;{result.evidenceText}&rdquo;
                         </blockquote>
                         {result.confidenceScore && (
                           <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5">
-                            Extraction confidence: {(result.confidenceScore * 100).toFixed(0)}%
+                            AI Confidence: {(result.confidenceScore * 100).toFixed(0)}%
                           </div>
                         )}
                       </div>
@@ -325,9 +325,9 @@ export default function ApplicationDetailPage({
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-5 transition-colors">
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Extracted Candidate Facts</h2>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Resume Information Summary</h2>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Structured information parsed from CV document (Version {profile.extractionVersion})
+                    Information extracted from candidate resume (Version {profile.extractionVersion})
                   </p>
                 </div>
                 <button
@@ -335,14 +335,14 @@ export default function ApplicationDetailPage({
                   className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1"
                 >
                   <Edit3 className="w-3.5 h-3.5" />
-                  {isEditingProfile ? 'Cancel Edit' : 'Correct Facts (Audit)'}
+                  {isEditingProfile ? 'Cancel Edit' : 'Edit Information'}
                 </button>
               </div>
 
               {/* Profile Correction Form */}
               {isEditingProfile && (
                 <form onSubmit={handleProfileCorrection} className="p-4 bg-indigo-50/50 dark:bg-indigo-950/40 rounded-xl border border-indigo-100 dark:border-indigo-900/50 space-y-3 text-xs">
-                  <p className="font-semibold text-indigo-900 dark:text-indigo-300">Audit Profile Correction</p>
+                  <p className="font-semibold text-indigo-900 dark:text-indigo-300">Correct Resume Information</p>
                   <div>
                     <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Extracted Skills (comma-separated):</label>
                     <input
@@ -353,11 +353,11 @@ export default function ApplicationDetailPage({
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Correction Audit Reason (required):</label>
+                    <label className="block text-slate-700 dark:text-slate-300 font-medium mb-1">Reason for change (required):</label>
                     <input
                       type="text"
                       required
-                      placeholder="Explain what was extracted incorrectly from the CV..."
+                      placeholder="Explain what needed to be corrected in the resume..."
                       value={correctionReason}
                       onChange={(e) => setCorrectionReason(e.target.value)}
                       className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs"
@@ -466,7 +466,7 @@ export default function ApplicationDetailPage({
 
             <form onSubmit={handleDecisionSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Human Decision:</label>
+                <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Your Hiring Decision:</label>
                 <div className="grid grid-cols-2 gap-2">
                   {(
                     [
@@ -494,12 +494,12 @@ export default function ApplicationDetailPage({
 
               <div>
                 <label className="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                  Decision Reason & Justification <span className="text-rose-500">*</span>
+                  Why did you make this decision? <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   required
-                  placeholder="Mandatory rationale for why this candidate was shortlisted, placed on hold, or rejected..."
+                  placeholder="Write a brief explanation for your choice..."
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   className="w-full p-2.5 border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none transition-colors"
@@ -512,15 +512,15 @@ export default function ApplicationDetailPage({
                 className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
-                {decisionSubmitting ? 'Recording Decision...' : 'Finalize Decision'}
+                {decisionSubmitting ? 'Recording Decision...' : 'Save Decision'}
               </button>
             </form>
           </div>
 
-          {/* Original CV Document Card */}
+          {/* Candidate's Resume File Card */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-3 transition-colors">
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Original CV Document
+              <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Candidate's Resume File
             </h3>
             <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/60 rounded-xl text-xs space-y-3">
               <div>
@@ -538,7 +538,7 @@ export default function ApplicationDetailPage({
                   className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-xl text-xs font-semibold transition-colors disabled:opacity-50"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  {downloadingCv ? 'Generating Access URL...' : 'Download Original CV'}
+                  {downloadingCv ? 'Generating Access URL...' : 'Download Resume'}
                 </button>
                 {downloadError && (
                   <p className="text-[11px] text-red-600 mt-1.5">{downloadError}</p>

@@ -267,7 +267,7 @@ export default function LoginPage() {
         {/* Footer & Border Divider */}
         <div className="text-center pt-2 space-y-2 border-t border-slate-100 dark:border-slate-800/80">
           <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-            TalentScreen Cloud • Enterprise Edition
+            TalentScreen • Simple & Smart Hiring Assistant
           </p>
 
           {/* Discreet sync button for test database reassurance */}
@@ -284,7 +284,7 @@ export default function LoginPage() {
                   <span>Syncing team accounts in database...</span>
                 </>
               ) : (
-                <span>Sync team credentials with database</span>
+                <span>Sync team accounts with database</span>
               )}
             </button>
 
