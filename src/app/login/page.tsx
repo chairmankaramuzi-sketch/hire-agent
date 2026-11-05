@@ -140,7 +140,7 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              TalentScreen
+              HIRE~Agent
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
               Sign in to your team account
@@ -267,7 +267,7 @@ export default function LoginPage() {
         {/* Footer & Border Divider */}
         <div className="text-center pt-2 space-y-2 border-t border-slate-100 dark:border-slate-800/80">
           <p className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-            TalentScreen • Simple & Smart Hiring Assistant
+            HIRE~Agent • Simple & Smart Hiring Assistant
           </p>
 
           {/* Discreet sync button for test database reassurance */}

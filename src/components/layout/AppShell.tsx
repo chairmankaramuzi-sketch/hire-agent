@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <FileCheck2 className="w-5 h-5 text-white" />
           </div>
           <span className="font-semibold text-base tracking-tight text-slate-900 dark:text-white">
-            TalentScreen AI
+            HIRE~Agent
           </span>
         </div>
 

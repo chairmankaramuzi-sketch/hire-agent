@@ -51,7 +51,7 @@ export class DossierService {
     const parsed: SampleCandidate[] = [];
 
     // If text matches the 30 candidate batch markers, map to sampleCandidates
-    if (rawText.includes('CANDIDATE #01') || rawText.includes('TALENTSCREEN AI | MULTI-CANDIDATE')) {
+    if (rawText.includes('CANDIDATE #01') || rawText.includes('TALENTSCREEN AI | MULTI-CANDIDATE') || rawText.includes('HIRE~AGENT')) {
       return sample30Candidates;
     }
 

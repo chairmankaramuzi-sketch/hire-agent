@@ -774,7 +774,7 @@ export const sample30Candidates: SampleCandidate[] = [
 
 export function generateCombinedDossierText(): string {
   const header = `================================================================================
-TALENTSCREEN AI | MULTI-CANDIDATE RECRUITMENT DOSSIER
+HIRE~AGENT | MULTI-CANDIDATE RECRUITMENT DOSSIER
 BATCH: 30 REALISTIC CANDIDATE CVS
 ROLE: SENIOR FULL-STACK ENGINEER (job-001)
 TOTAL CANDIDATES IN DOSSIER: 30

@@ -3,7 +3,7 @@ import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 
 export const metadata: Metadata = {
-  title: 'AI Recruitment & CV Screening System',
+  title: 'HIRE~Agent | AI Recruitment & Candidate Screening',
   description: 'Explainable AI-powered recruitment and candidate screening for HR teams',
 };
 
