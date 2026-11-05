@@ -145,9 +145,9 @@ export default function NewJobPage() {
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Define New Vacancy & Criteria</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Post a New Job</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Set up job details and specify strict mandatory requirements vs weighted evaluation criteria.
+            Enter job details and choose your must-have requirements and scored skills.
           </p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function NewJobPage() {
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">Screening & Evaluation Criteria</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Mandatory criteria gate eligibility; scored criteria determine candidate rank.
+                Must-have requirements decide if a candidate qualifies. Scored skills calculate their final match percentage.
               </p>
             </div>
 

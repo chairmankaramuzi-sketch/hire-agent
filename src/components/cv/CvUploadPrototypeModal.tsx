@@ -209,7 +209,7 @@ export function CvUploadPrototypeModal({
       setResults({
         succeeded: refreshed.items,
         failedCount: 0,
-        message: 'Ingested & screened all 30 realistic candidate CVs in one place!',
+        message: 'Reviewed & scored all 30 sample candidate resumes in one place!',
       });
       onUploadSuccess(refreshed.items);
     } catch (err: any) {
@@ -231,9 +231,9 @@ export function CvUploadPrototypeModal({
         {/* Modal Header */}
         <div className="p-5 sm:p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Upload Candidate CVs</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Upload Candidate Resumes</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Upload single CVs or a combined multi-candidate dossier for AI extraction and screening.
+              Upload individual resumes or sample candidate files to automatically review them with AI.
             </p>
           </div>
           <button
@@ -250,10 +250,10 @@ export function CvUploadPrototypeModal({
             <div className="space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-xs text-indigo-950 dark:text-indigo-300">
                 <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                Combined 30-Candidate Test Dossier Available
+                Test with 30 Sample Resumes
               </div>
               <p className="text-[11px] text-indigo-700 dark:text-indigo-300/80 leading-tight">
-                Single master document containing 30 realistic candidate profiles to test end-to-end AI screening.
+                Try out the system with a sample file of 30 candidate resumes.
               </p>
             </div>
 
@@ -264,7 +264,7 @@ export function CvUploadPrototypeModal({
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-slate-700 shadow-sm transition-colors"
               >
                 <Download className="w-3.5 h-3.5" />
-                Download Dossier (.txt)
+                Download Sample Resumes (.txt)
               </a>
 
               <button
@@ -276,12 +276,12 @@ export function CvUploadPrototypeModal({
                 {batchIngesting ? (
                   <>
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    Screening 30 CVs...
+                    Reviewing 30 Resumes...
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-3.5 h-3.5" />
-                    Process Combined 30 CVs
+                    Load & Score 30 Sample Resumes
                   </>
                 )}
               </button>

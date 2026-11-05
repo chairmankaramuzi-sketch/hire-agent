@@ -89,7 +89,7 @@ export default function JobApplicationsPage({
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm shadow-md shadow-indigo-600/20 transition-all"
           >
             <Upload className="w-4 h-4" />
-            Upload Candidate CVs
+            Upload Candidate Resumes
           </button>
         </div>
       </div>
@@ -98,11 +98,9 @@ export default function JobApplicationsPage({
       <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 flex items-start gap-3 text-xs text-indigo-950 dark:text-indigo-200 transition-colors">
         <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <p className="font-semibold text-indigo-900 dark:text-indigo-300">Deterministic Screening Rule Enforced</p>
+          <p className="font-semibold text-indigo-900 dark:text-indigo-300">How Resumes Are Evaluated</p>
           <p className="text-indigo-800 dark:text-indigo-200/80 leading-relaxed">
-            Candidates who fail mandatory requirements are classified as <strong>INELIGIBLE</strong> regardless of
-            how high their weighted score is. Applications with ambiguous or missing evidence are placed in the{' '}
-            <strong>NEEDS REVIEW</strong> queue for human oversight.
+            Candidates must meet all must-have requirements to qualify. If any requirement is missing or unclear, they are placed in <strong>NEEDS REVIEW</strong> so you can inspect them personally.
           </p>
         </div>
       </div>
@@ -114,9 +112,9 @@ export default function JobApplicationsPage({
           {(
             [
               { key: 'ALL', label: 'All Applicants' },
-              { key: 'ELIGIBLE', label: 'Eligible Shortlist' },
+              { key: 'ELIGIBLE', label: 'Qualified Candidates' },
               { key: 'NEEDS_REVIEW', label: 'Needs Review' },
-              { key: 'INELIGIBLE', label: 'Ineligible' },
+              { key: 'INELIGIBLE', label: 'Did Not Qualify' },
             ] as const
           ).map((tab) => (
             <button
