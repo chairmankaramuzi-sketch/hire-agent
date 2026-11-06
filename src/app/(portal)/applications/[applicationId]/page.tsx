@@ -22,6 +22,9 @@ import {
 import { applicationsService, jobsService } from '@/services';
 import { Application, Job, ReviewDecisionType, User } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
+import { InterviewQuestionGenerator } from '@/components/candidate/InterviewQuestionGenerator';
+import { EmailDrafterModal } from '@/components/candidate/EmailDrafterModal';
+import { Mail, Printer, Sparkles } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 
 export default function ApplicationDetailPage({
@@ -51,6 +54,10 @@ export default function ApplicationDetailPage({
   // CV download states
   const [downloadingCv, setDownloadingCv] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  // AI Outreach & Workbench states
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [highlightedEvidence, setHighlightedEvidence] = useState<string | null>(null);
 
   const handleDownloadCv = async () => {
     setDownloadingCv(true);
@@ -213,7 +220,27 @@ export default function ApplicationDetailPage({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setEmailModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold shadow-sm transition-all"
+            title="Draft email invitation or feedback to candidate"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            <span>Draft Outreach Email</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold shadow-sm transition-all"
+            title="Print or export candidate brief"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Print Brief</span>
+          </button>
+
           {run && (
             <div className="px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4 text-xs transition-colors">
               <div>
@@ -307,6 +334,19 @@ export default function ApplicationDetailPage({
                         <blockquote className="italic text-slate-600 dark:text-slate-300 border-l-2 border-indigo-400 pl-2">
                           &ldquo;{result.evidenceText}&rdquo;
                         </blockquote>
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setHighlightedEvidence(result.evidenceText || null);
+                              const el = document.getElementById('candidate-profile-summary');
+                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }}
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                          >
+                            <span>🔍 Click to highlight in candidate profile</span>
+                          </button>
+                        </div>
                         {result.confidenceScore && (
                           <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5">
                             AI Confidence: {(result.confidenceScore * 100).toFixed(0)}%
@@ -320,9 +360,40 @@ export default function ApplicationDetailPage({
             </div>
           )}
 
+          {/* AI-Tailored Interview Question Generator */}
+          <InterviewQuestionGenerator
+            candidateName={application.applicant.fullName}
+            jobTitle={job?.title ?? 'Engineering Role'}
+            missingOrBorderlineCriteria={
+              run?.criterionResults
+                .filter((r) => r.status === 'NOT_MET' || r.status === 'UNKNOWN')
+                .map((r) => r.criterionName) || []
+            }
+            skills={profile?.skills || []}
+          />
+
           {/* Extracted Candidate Profile */}
           {profile && (
-            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-5 transition-colors">
+            <div
+              id="candidate-profile-summary"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-5 transition-colors"
+            >
+              {highlightedEvidence && (
+                <div className="p-3.5 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/90 border-2 border-indigo-500 text-indigo-950 dark:text-indigo-200 text-xs flex items-start justify-between gap-3 animate-in fade-in">
+                  <div>
+                    <span className="font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 mb-1">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Verified Citation Excerpt:
+                    </span>
+                    <p className="italic font-medium text-slate-800 dark:text-slate-100">&ldquo;{highlightedEvidence}&rdquo;</p>
+                  </div>
+                  <button
+                    onClick={() => setHighlightedEvidence(null)}
+                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 dark:text-white">Resume Information Summary</h2>
@@ -574,6 +645,16 @@ export default function ApplicationDetailPage({
           </div>
         </div>
       </div>
+      {/* Email Drafter Modal */}
+      <EmailDrafterModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        candidateName={application.applicant.fullName}
+        candidateEmail={application.applicant.email}
+        jobTitle={job?.title ?? 'Engineering Role'}
+        reviewerName={currentUser.name}
+        score={run?.totalScore ?? 0}
+      />
     </div>
   );
 }

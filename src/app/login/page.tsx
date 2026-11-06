@@ -6,6 +6,7 @@ import { ArrowRight, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
 import { authService } from '@/services/auth';
 import { systemService } from '@/services/system';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { HireAgentLogo } from '@/components/brand/HireAgentLogo';
 
 type RoleKey = 'kalamuzi' | 'nahurira' | 'rose' | 'custom';
 
@@ -124,19 +125,8 @@ export default function LoginPage() {
         
         {/* Startup Logo & Title */}
         <div className="text-center space-y-2.5">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-xl shadow-indigo-600/30 text-white mx-auto">
-            {/* Clean geometric startup vector logo */}
-            <svg
-              className="w-6 h-6 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
+          <div className="flex justify-center mx-auto mb-1">
+            <HireAgentLogo size="xl" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
