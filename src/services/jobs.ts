@@ -25,6 +25,17 @@ function getApiBaseUrl(): string {
 // In-memory clone to simulate persistence during tests or offline mode
 let jobsState: Job[] = JSON.parse(JSON.stringify(mockJobs));
 
+// In-memory client-side cache for instantaneous job page navigation
+const jobsCache = new Map<string, { timestamp: number; data: Job[] }>();
+const singleJobCache = new Map<string, { timestamp: number; data: Job }>();
+const JOBS_CACHE_TTL_MS = 35000; // 35 seconds
+const SINGLE_JOB_CACHE_TTL_MS = 60000; // 60 seconds
+
+export function clearJobsCache() {
+  jobsCache.clear();
+  singleJobCache.clear();
+}
+
 export function mapPrismaJobToDomain(item: any): Job {
   return {
     id: item.id,
@@ -61,6 +72,12 @@ export interface GetJobsFilter {
 
 export const jobsService = {
   async getJobs(filter?: GetJobsFilter): Promise<Job[]> {
+    const cacheKey = JSON.stringify(filter || {});
+    const cached = jobsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < JOBS_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     // Attempt live API fetch first
     try {
       const query = new URLSearchParams();
@@ -82,6 +99,11 @@ export const jobsService = {
         if (Array.isArray(json.data)) {
           const fetchedJobs = json.data.map(mapPrismaJobToDomain);
 
+          const now = Date.now();
+          for (const j of fetchedJobs) {
+            singleJobCache.set(j.id, { timestamp: now, data: j });
+          }
+
           // Apply client-side sorting if specified
           if (filter?.sortBy) {
             fetchedJobs.sort((a: Job, b: Job) => {
@@ -97,15 +119,13 @@ export const jobsService = {
             });
           }
 
+          jobsCache.set(cacheKey, { timestamp: now, data: fetchedJobs });
           return fetchedJobs;
         }
       }
     } catch {
       // In offline/test environments, proceed to in-memory state
     }
-
-    // In-memory fallback
-    await new Promise((resolve) => setTimeout(resolve, 30));
 
     let results = [...jobsState];
 
@@ -138,6 +158,11 @@ export const jobsService = {
   },
 
   async getJobById(jobId: string): Promise<Job | null> {
+    const cached = singleJobCache.get(jobId);
+    if (cached && Date.now() - cached.timestamp < SINGLE_JOB_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v1/jobs/${jobId}`, {
         headers: defaultHeaders,
@@ -146,14 +171,15 @@ export const jobsService = {
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
-          return mapPrismaJobToDomain(json.data);
+          const mapped = mapPrismaJobToDomain(json.data);
+          singleJobCache.set(jobId, { timestamp: Date.now(), data: mapped });
+          return mapped;
         }
       }
     } catch {
       // fallback
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 30));
     const job = jobsState.find((j) => j.id === jobId);
     return job ? JSON.parse(JSON.stringify(job)) : null;
   },
@@ -214,6 +240,7 @@ export const jobsService = {
           } catch {}
         }
 
+        clearJobsCache();
         jobsState.unshift(createdJob);
         return createdJob;
       }
@@ -221,7 +248,7 @@ export const jobsService = {
       // In-memory fallback
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 40));
+    clearJobsCache();
 
     const newJobId = `job-${Date.now()}`;
     const now = new Date().toISOString();
@@ -278,12 +305,13 @@ export const jobsService = {
         }),
       });
       if (res.ok) {
+        clearJobsCache();
         const json = await res.json();
         return mapPrismaJobToDomain(json.data);
       }
     } catch {}
 
-    await new Promise((resolve) => setTimeout(resolve, 40));
+    clearJobsCache();
 
     const index = jobsState.findIndex((j) => j.id === jobId);
     if (index === -1) {
@@ -303,5 +331,6 @@ export const jobsService = {
 
   resetState() {
     jobsState = JSON.parse(JSON.stringify(mockJobs));
+    clearJobsCache();
   },
 };

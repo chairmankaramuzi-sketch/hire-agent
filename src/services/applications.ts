@@ -33,6 +33,17 @@ function getApiBaseUrl(): string {
 // In-memory clone to simulate live interaction during tests / fallback
 let applicationsState: Application[] = JSON.parse(JSON.stringify(mockApplications));
 
+// In-memory client-side cache for instantaneous page switching and 0ms candidate views
+const appsCache = new Map<string, { timestamp: number; data: PaginatedApplications }>();
+const singleAppCache = new Map<string, { timestamp: number; data: Application }>();
+const APPS_CACHE_TTL_MS = 25000; // 25 seconds
+const SINGLE_APP_CACHE_TTL_MS = 60000; // 60 seconds
+
+export function clearApplicationsCache() {
+  appsCache.clear();
+  singleAppCache.clear();
+}
+
 export function mapPrismaApplicationToDomain(item: any): Application {
   const latestScreening = item.latestScreening ?? item.screenings?.[0] ?? null;
   const decisions = item.decisions ?? [];
@@ -261,6 +272,12 @@ export interface PaginatedApplications {
 
 export const applicationsService = {
   async getApplications(filter?: GetApplicationsFilter): Promise<PaginatedApplications> {
+    const cacheKey = JSON.stringify(filter || {});
+    const cached = appsCache.get(cacheKey);
+    if (cached && Date.now() - cached.timestamp < APPS_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     // Attempt live API querying first
     try {
       const query = new URLSearchParams();
@@ -280,6 +297,12 @@ export const applicationsService = {
         const json = await res.json();
         if (Array.isArray(json.data)) {
           let items: Application[] = json.data.map(mapPrismaApplicationToDomain);
+
+          // Populate single application cache for instantaneous detail views
+          const now = Date.now();
+          for (const item of items) {
+            singleAppCache.set(item.id, { timestamp: now, data: item });
+          }
 
           if (filter?.queue && filter.queue !== 'ALL') {
             if (filter.queue === 'ELIGIBLE') {
@@ -312,20 +335,22 @@ export const applicationsService = {
             });
           }
 
-          return {
+          const total = json.meta?.total ?? json.pagination?.total ?? items.length;
+          const result: PaginatedApplications = {
             items,
-            total: json.pagination?.total ?? items.length,
+            total,
             page: filter?.page ?? 1,
             pageSize: filter?.pageSize ?? 50,
-            totalPages: json.pagination?.totalPages ?? (Math.ceil((json.pagination?.total ?? items.length) / (filter?.pageSize ?? 50)) || 1),
+            totalPages: json.meta?.totalPages ?? json.pagination?.totalPages ?? (Math.ceil(total / (filter?.pageSize ?? 50)) || 1),
           };
+
+          appsCache.set(cacheKey, { timestamp: now, data: result });
+          return result;
         }
       }
     } catch {
       // proceed to in-memory fallback
     }
-
-    await new Promise((resolve) => setTimeout(resolve, 30));
 
     let items = [...applicationsState];
 
@@ -407,6 +432,11 @@ export const applicationsService = {
   },
 
   async getApplicationById(id: string): Promise<Application | null> {
+    const cached = singleAppCache.get(id);
+    if (cached && Date.now() - cached.timestamp < SINGLE_APP_CACHE_TTL_MS) {
+      return cached.data;
+    }
+
     try {
       const res = await fetch(`${getApiBaseUrl()}/api/v1/applications/${id}`, {
         headers: defaultHeaders,
@@ -415,12 +445,13 @@ export const applicationsService = {
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
-          return mapPrismaApplicationToDomain(json.data);
+          const mapped = mapPrismaApplicationToDomain(json.data);
+          singleAppCache.set(id, { timestamp: Date.now(), data: mapped });
+          return mapped;
         }
       }
     } catch {}
 
-    await new Promise((resolve) => setTimeout(resolve, 30));
     const app = applicationsState.find((a) => a.id === id);
     return app ? JSON.parse(JSON.stringify(app)) : null;
   },
@@ -454,12 +485,15 @@ export const applicationsService = {
       });
 
       if (res.ok) {
+        singleAppCache.delete(params.applicationId);
+        appsCache.clear();
         const fullApp = await this.getApplicationById(params.applicationId);
         if (fullApp) return fullApp;
       }
     } catch {}
 
-    await new Promise((resolve) => setTimeout(resolve, 40));
+    singleAppCache.delete(params.applicationId);
+    appsCache.clear();
 
     const appIndex = applicationsState.findIndex((a) => a.id === params.applicationId);
     if (appIndex === -1) {
@@ -529,6 +563,7 @@ export const applicationsService = {
     } catch {}
 
     const fullApp = await this.getApplicationById(applicationId);
+    appsCache.clear();
     return fullApp || mapPrismaApplicationToDomain(createdJson.data);
   },
 
@@ -553,12 +588,15 @@ export const applicationsService = {
       });
 
       if (res.ok) {
+        singleAppCache.delete(params.applicationId);
+        appsCache.clear();
         const fullApp = await this.getApplicationById(params.applicationId);
         if (fullApp) return fullApp;
       }
     } catch {}
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    singleAppCache.delete(params.applicationId);
+    appsCache.clear();
 
     const appIndex = applicationsState.findIndex((a) => a.id === params.applicationId);
     if (appIndex === -1) {
@@ -598,12 +636,15 @@ export const applicationsService = {
         headers: defaultHeaders,
       });
       if (res.ok) {
+        singleAppCache.delete(applicationId);
+        appsCache.clear();
         const fullApp = await this.getApplicationById(applicationId);
         if (fullApp) return fullApp;
       }
     } catch {}
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    singleAppCache.delete(applicationId);
+    appsCache.clear();
 
     const appIndex = applicationsState.findIndex((a) => a.id === applicationId);
     if (appIndex === -1) {
@@ -753,6 +794,7 @@ export const applicationsService = {
       }
     }
 
+    appsCache.clear();
     return { succeeded: created, failedCount: failed };
   },
 
@@ -764,7 +806,7 @@ export const applicationsService = {
       });
       if (res.ok) {
         const json = await res.json();
-        const m = json.pagination?.metrics;
+        const m = json.meta?.metrics || json.pagination?.metrics;
         if (m) {
           return {
             activeVacancies: m.activeVacancies ?? 0,
@@ -775,8 +817,6 @@ export const applicationsService = {
         }
       }
     } catch {}
-
-    await new Promise((resolve) => setTimeout(resolve, 30));
 
     const activeVacancies = mockJobs.filter((j) => j.status === 'PUBLISHED').length;
     const totalApplications = applicationsState.length;
@@ -798,5 +838,6 @@ export const applicationsService = {
 
   resetState() {
     applicationsState = JSON.parse(JSON.stringify(mockApplications));
+    clearApplicationsCache();
   },
 };

@@ -14,9 +14,8 @@ export const prisma =
         : ['error'],
   });
 
-if (getEnv().NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Always reuse Prisma connection on globalThis across warm serverless invocations
+globalForPrisma.prisma = prisma;
 
 // Ensure BigInt values (e.g. cvAsset.sizeBytes) serialize cleanly to JSON
 if (typeof BigInt !== 'undefined' && !(BigInt.prototype as any).toJSON) {

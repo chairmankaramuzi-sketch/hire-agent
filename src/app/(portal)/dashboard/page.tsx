@@ -77,18 +77,37 @@ export default function DashboardPage() {
 
   const loadData = React.useCallback(async () => {
     try {
-      const [m, j, apps] = await Promise.all([
-        applicationsService.getDashboardMetrics(),
+      const [j, apps] = await Promise.all([
         jobsService.getJobs({ sortBy: 'createdAt', sortOrder: 'desc' }),
         applicationsService.getApplications({ pageSize: 50, sortBy: 'createdAt', sortOrder: 'desc' }),
       ]);
-      setMetrics(m);
+
+      const activeVacancies = j.filter((x) => x.status === 'PUBLISHED').length;
+      const totalApplications = apps.total || apps.items.length;
+      const awaitingReview = apps.items.filter(
+        (a) =>
+          a.status === 'NEEDS_REVIEW' ||
+          a.screeningRun?.mandatoryStatus === 'UNKNOWN' ||
+          (a.status === 'SCREENED' && a.reviewDecisions.length === 0)
+      ).length;
+      const processingFailures = apps.items.filter((a) => a.processingStatus === 'FAILED' || a.status === 'NEEDS_REVIEW').length;
+
+      setMetrics({
+        activeVacancies,
+        totalApplications,
+        awaitingReview,
+        processingFailures,
+      });
       setJobs(j);
       setAllApplications(apps.items);
     } finally {
       setLoading(false);
     }
-    loadCounts();
+
+    // Defer loading heavy 8-table Danger Zone count query so primary dashboard renders immediately
+    setTimeout(() => {
+      loadCounts();
+    }, 1200);
   }, [loadCounts]);
 
   useEffect(() => {
