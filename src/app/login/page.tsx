@@ -144,7 +144,7 @@ export default function LoginPage() {
             Quick switch account:
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {ACCOUNTS.map((acc) => {
               const isSelected = selectedRole === acc.key;
               return (

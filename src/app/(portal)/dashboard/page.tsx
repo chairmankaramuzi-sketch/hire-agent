@@ -476,11 +476,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Tag Filters */}
-          <div className="hidden lg:flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full scrollbar-none whitespace-nowrap">
             <button
               type="button"
               onClick={() => setFilterTag('all')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium shrink-0 transition-colors ${
                 filterTag === 'all'
                   ? 'bg-slate-800 dark:bg-slate-700 text-white font-semibold'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -491,7 +491,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setFilterTag('needs_review')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium shrink-0 transition-colors ${
                 filterTag === 'needs_review'
                   ? 'bg-amber-500 text-white font-semibold'
                   : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
@@ -502,7 +502,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setFilterTag('eligible')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium shrink-0 transition-colors ${
                 filterTag === 'eligible'
                   ? 'bg-emerald-600 text-white font-semibold'
                   : 'text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
@@ -513,7 +513,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setFilterTag('high_score')}
-              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium shrink-0 transition-colors ${
                 filterTag === 'high_score'
                   ? 'bg-indigo-600 text-white font-semibold'
                   : 'text-indigo-700 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40'
@@ -525,7 +525,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Right: Search Input & Role Selector */}
-        <div className="flex items-center gap-2.5 flex-1 max-w-md justify-end">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full md:max-w-md justify-end">
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
             <input

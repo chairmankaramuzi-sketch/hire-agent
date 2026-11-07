@@ -257,7 +257,7 @@ export function CvUploadPrototypeModal({
               </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
               <a
                 href="/sample_docs/Combined_30_Candidates_Dossier.txt"
                 download="Combined_30_Candidates_Dossier.txt"

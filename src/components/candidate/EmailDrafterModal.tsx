@@ -115,7 +115,7 @@ HIRE~Agent`,
         </div>
 
         {/* Template Selector Tabs */}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full scrollbar-none whitespace-nowrap">
           {(
             [
               { key: 'interview', label: 'Interview Invitation' },
@@ -126,7 +126,7 @@ HIRE~Agent`,
             <button
               key={tab.key}
               onClick={() => setTemplate(tab.key)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0 transition-colors ${
                 template === tab.key
                   ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -153,12 +153,12 @@ HIRE~Agent`,
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <span className="text-[11px] text-slate-400">
             Automatically personalized by HIRE~Agent AI
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
               type="button"
               onClick={handleCopy}

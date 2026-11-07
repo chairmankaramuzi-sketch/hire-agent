@@ -161,7 +161,7 @@ export default function AllApplicationsPage() {
 
       {/* Floating Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="sticky top-4 z-30 p-3.5 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-800 flex items-center justify-between gap-4 animate-in slide-in-from-top-2">
+        <div className="sticky top-4 z-30 p-3.5 bg-slate-900 text-white rounded-2xl shadow-xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2 text-xs font-semibold">
             <span className="w-6 h-6 rounded-lg bg-indigo-600 flex items-center justify-center text-xs">
               {selectedIds.size}
@@ -169,7 +169,7 @@ export default function AllApplicationsPage() {
             <span>candidates selected</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => handleBulkDecision('SHORTLISTED')}
               disabled={bulkActionLoading}
@@ -198,7 +198,7 @@ export default function AllApplicationsPage() {
 
       {/* Filter and Search Bar */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
-        <div className="flex items-center gap-1 border-b md:border-b-0 border-slate-100 dark:border-slate-800 pb-2 md:pb-0 w-full md:w-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full scrollbar-none whitespace-nowrap border-b md:border-b-0 border-slate-100 dark:border-slate-800 w-full md:w-auto">
           {(
             [
               { key: 'ALL', label: 'All' },
@@ -210,7 +210,7 @@ export default function AllApplicationsPage() {
             <button
               key={tab.key}
               onClick={() => setQueueFilter(tab.key)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0 transition-colors ${
                 queueFilter === tab.key
                   ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'

@@ -108,7 +108,7 @@ export default function JobApplicationsPage({
       {/* Queue Tabs and Search */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-colors">
         {/* Queue Filter Tabs */}
-        <div className="flex items-center gap-1 border-b md:border-b-0 border-slate-100 dark:border-slate-800 pb-2 md:pb-0 w-full md:w-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full scrollbar-none whitespace-nowrap border-b md:border-b-0 border-slate-100 dark:border-slate-800 w-full md:w-auto">
           {(
             [
               { key: 'ALL', label: 'All Applicants' },
@@ -120,7 +120,7 @@ export default function JobApplicationsPage({
             <button
               key={tab.key}
               onClick={() => setQueueTab(tab.key)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-xl transition-colors ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded-xl shrink-0 transition-colors ${
                 queueTab === tab.key
                   ? 'bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
