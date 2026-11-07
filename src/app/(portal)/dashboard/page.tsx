@@ -79,7 +79,7 @@ export default function DashboardPage() {
     try {
       const [j, apps] = await Promise.all([
         jobsService.getJobs({ sortBy: 'createdAt', sortOrder: 'desc' }),
-        applicationsService.getApplications({ pageSize: 50, sortBy: 'createdAt', sortOrder: 'desc' }),
+        applicationsService.getApplications({ pageSize: 15, sortBy: 'createdAt', sortOrder: 'desc' }),
       ]);
 
       const activeVacancies = j.filter((x) => x.status === 'PUBLISHED').length;

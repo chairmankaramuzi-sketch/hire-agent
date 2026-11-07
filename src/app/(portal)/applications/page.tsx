@@ -46,10 +46,17 @@ export default function AllApplicationsPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [queueFilter, setQueueFilter] = useState<'ALL' | 'ELIGIBLE' | 'INELIGIBLE' | 'NEEDS_REVIEW'>('ALL');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [bulkFeedback, setBulkFeedback] = useState<string | null>(null);
+
+  // Debounce search keystrokes to prevent unnecessary API queries
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedSearch(search), 250);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   // View Mode: Table vs Visual Kanban Pipeline
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
@@ -71,8 +78,9 @@ export default function AllApplicationsPage() {
       setLoading(true);
       try {
         const res = await applicationsService.getApplications({
-          search,
+          search: debouncedSearch,
           queue: queueFilter,
+          pageSize: 25,
           sortBy: 'score',
           sortOrder: 'desc',
         });
@@ -82,7 +90,7 @@ export default function AllApplicationsPage() {
       }
     }
     fetchApps();
-  }, [search, queueFilter]);
+  }, [debouncedSearch, queueFilter]);
 
   // Dynamic score re-calculation engine based on custom weights
   const calculateDynamicScore = (app: Application, w: CriteriaWeights): number => {

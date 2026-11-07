@@ -55,7 +55,14 @@ export async function GET(request: NextRequest) {
             status: true,
           },
         },
-        cvAsset: true,
+        cvAsset: {
+          select: {
+            id: true,
+            originalFilename: true,
+            sizeBytes: true,
+            detectedMimeType: true,
+          },
+        },
         screenings: {
           orderBy: { criteriaVersion: 'desc' },
           take: 1,
@@ -63,20 +70,6 @@ export async function GET(request: NextRequest) {
         decisions: {
           orderBy: { createdAt: 'desc' },
           take: 1,
-          include: {
-            decider: {
-              select: { id: true, displayName: true, email: true },
-            },
-          },
-        },
-        notes: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          include: {
-            author: {
-              select: { id: true, displayName: true, email: true },
-            },
-          },
         },
         extractions: {
           where: { status: 'COMPLETED' },
