@@ -366,7 +366,7 @@ export default function ApplicationDetailPage({
             jobTitle={job?.title ?? 'Engineering Role'}
             missingOrBorderlineCriteria={
               run?.criterionResults
-                .filter((r) => r.status === 'NOT_MET' || r.status === 'UNKNOWN')
+                .filter((r) => r.status === 'DOES_NOT_MEET' || r.status === 'UNKNOWN')
                 .map((r) => r.criterionName) || []
             }
             skills={profile?.skills || []}

@@ -23,9 +23,9 @@ export function VisualAnalytics({ applications }: VisualAnalyticsProps) {
 
   // Funnel calculations
   const meetsMandatory = applications.filter((a) => a.screeningRun?.mandatoryStatus === 'MEETS').length;
-  const shortlisted = applications.filter((a) => a.hrDecision?.decision === 'SHORTLISTED').length;
+  const shortlisted = applications.filter((a) => a.status === 'SHORTLISTED' || a.reviewDecisions?.[0]?.decision === 'SHORTLIST').length;
   const needsReview = applications.filter(
-    (a) => a.screeningRun?.mandatoryStatus === 'UNKNOWN' || !a.hrDecision
+    (a) => a.screeningRun?.mandatoryStatus === 'UNKNOWN' || a.reviewDecisions?.length === 0
   ).length;
 
   const maxScoreCount = Math.max(tier90, tier80, tier70, tierBelow, 1);

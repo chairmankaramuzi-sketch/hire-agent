@@ -58,8 +58,11 @@ export default function AllApplicationsPage() {
     try {
       await Promise.all(
         idsToUpdate.map((appId) =>
-          applicationsService.recordDecision(appId, {
-            decision,
+          applicationsService.addReviewDecision({
+            applicationId: appId,
+            reviewerId: 'usr-admin-001',
+            reviewerName: 'MR. KALAMUZI',
+            decision: decision === 'SHORTLISTED' ? 'SHORTLIST' : 'REJECT',
             reason: `Bulk decision applied by reviewer on ${new Date().toLocaleDateString()}`,
           })
         )
@@ -71,15 +74,19 @@ export default function AllApplicationsPage() {
           selectedIds.has(app.id)
             ? {
                 ...app,
-                status: decision === 'SHORTLISTED' ? ('SHORTLISTED' as any) : ('REJECTED' as any),
-                hrDecision: {
-                  id: 'bulk-' + Date.now(),
-                  applicationId: app.id,
-                  decidedBy: 'usr-admin-001',
-                  decision,
-                  reason: 'Bulk action applied',
-                  decidedAt: new Date().toISOString(),
-                },
+                status: decision === 'SHORTLISTED' ? ('SHORTLISTED' as any) : ('REJECTED_AFTER_REVIEW' as any),
+                reviewDecisions: [
+                  {
+                    id: 'bulk-' + Date.now(),
+                    applicationId: app.id,
+                    reviewerId: 'usr-admin-001',
+                    reviewerName: 'MR. KALAMUZI',
+                    decision: decision === 'SHORTLISTED' ? 'SHORTLIST' : 'REJECT',
+                    reason: 'Bulk action applied',
+                    createdAt: new Date().toISOString(),
+                  },
+                  ...(app.reviewDecisions || []),
+                ],
               }
             : app
         )

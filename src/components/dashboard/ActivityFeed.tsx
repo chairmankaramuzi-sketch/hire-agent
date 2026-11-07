@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Activity, CheckCircle2, UserCheck, Briefcase, FileText } from 'lucide-react';
+import { Activity, CheckCircle2, Briefcase, FileText } from 'lucide-react';
 import { Application } from '@/types';
 
 interface ActivityFeedProps {
@@ -9,23 +9,25 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ applications }: ActivityFeedProps) {
-  // Synthesize recent activity from real applications and decisions
   const recentDecisions = applications
-    .filter((a) => a.hrDecision)
+    .filter((a) => a.reviewDecisions && a.reviewDecisions.length > 0)
     .slice(0, 5)
-    .map((a) => ({
-      id: `dec-${a.id}`,
-      user: a.hrDecision?.decidedBy === 'usr-admin-001' ? 'MR. KALAMUZI' : 'MR. NAHURIRA',
-      role: a.hrDecision?.decidedBy === 'usr-admin-001' ? 'Admin' : 'HR Director',
-      action: a.hrDecision?.decision === 'SHORTLISTED' ? 'shortlisted' : 'reviewed',
-      target: a.candidateName,
-      time: 'Recently',
-      badgeColor:
-        a.hrDecision?.decision === 'SHORTLISTED'
-          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
-          : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
-      icon: CheckCircle2,
-    }));
+    .map((a) => {
+      const rev = a.reviewDecisions[0];
+      return {
+        id: `dec-${a.id}`,
+        user: rev.reviewerName || 'MR. KALAMUZI',
+        role: rev.reviewerId === 'usr-admin-001' ? 'Admin' : 'HR Director',
+        action: rev.decision === 'SHORTLIST' ? 'shortlisted' : 'reviewed',
+        target: a.applicant?.fullName || 'Candidate',
+        time: 'Recently',
+        badgeColor:
+          rev.decision === 'SHORTLIST'
+            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+            : 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+        icon: CheckCircle2,
+      };
+    });
 
   const defaultFeed = [
     {
@@ -33,7 +35,7 @@ export function ActivityFeed({ applications }: ActivityFeedProps) {
       user: 'MR. NAHURIRA',
       role: 'HR Director',
       action: 'screened and shortlisted',
-      target: applications[0]?.candidateName || 'Elena Rostova',
+      target: applications[0]?.applicant?.fullName || 'Elena Rostova',
       time: '12m ago',
       badgeColor: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
       icon: CheckCircle2,
