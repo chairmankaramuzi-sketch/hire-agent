@@ -126,8 +126,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center items-center py-10 px-4 sm:px-6 lg:px-8 transition-colors relative">
       {/* Floating Theme Switcher */}
-      <div className="absolute top-5 right-5 sm:top-8 sm:right-8 z-20">
-        <ThemeToggle />
+      <div className="absolute top-4 right-4 sm:top-8 sm:right-8 z-20">
+        <ThemeToggle showLabel={true} />
       </div>
 
       {/* Main Bordered Card Container */}
