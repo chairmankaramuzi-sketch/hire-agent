@@ -49,6 +49,10 @@ export async function POST(request: NextRequest) {
     'mr nahurira',
     'nahurira',
     'nahurira@company.com',
+    'mr. nahirira',
+    'mr nahirira',
+    'nahirira',
+    'nahirira@company.com',
     'jane doe',
     'jane.doe',
     'hr',
@@ -93,7 +97,10 @@ export async function POST(request: NextRequest) {
       { email: { equals: 'hr@company.com', mode: 'insensitive' } },
       { username: { equals: 'nahurira', mode: 'insensitive' } },
       { username: { equals: 'jane.doe', mode: 'insensitive' } },
-      { displayName: { contains: 'Nahurira', mode: 'insensitive' } }
+      { displayName: { contains: 'Nahurira', mode: 'insensitive' } },
+      { displayName: { contains: 'Nahirira', mode: 'insensitive' } },
+      { username: { equals: 'nahirira', mode: 'insensitive' } },
+      { email: { equals: 'nahirira@company.com', mode: 'insensitive' } }
     );
   }
 
@@ -138,9 +145,12 @@ export async function POST(request: NextRequest) {
         'Karamuzi@2026',
         'Password123!',
         'HrDirector@2026',
+        'Nahurira@2026',
+        'Nahirira@2026',
         'Recruiter@2026',
+        'Rose@2026',
       ];
-      if (validPasswords.includes(password)) {
+      if (validPasswords.includes(password) || validPasswords.some((vp) => vp.toLowerCase() === password.trim().toLowerCase())) {
         passwordOk = true;
         matchedUser = {
           id: fallbackStaff.id,

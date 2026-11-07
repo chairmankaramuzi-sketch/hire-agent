@@ -55,10 +55,10 @@ const ACCOUNTS: AccountOption[] = [
 export default function LoginPage() {
   const router = useRouter();
 
-  // Selected account state
-  const [selectedRole, setSelectedRole] = useState<RoleKey>('kalamuzi');
-  const [username, setUsername] = useState('MR. KALAMUZI');
-  const [password, setPassword] = useState('Admin@2026');
+  // Selected account state - empty by default so KALAMUZI, NAHURIRA, and ROSE can type manually
+  const [selectedRole, setSelectedRole] = useState<RoleKey>('custom');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -81,10 +81,16 @@ export default function LoginPage() {
 
   const handleInputChange = (val: string) => {
     setUsername(val);
-    const matched = ACCOUNTS.find(
-      (a) => a.loginInput.toLowerCase() === val.trim().toLowerCase()
-    );
-    setSelectedRole(matched ? matched.key : 'custom');
+    const cleaned = val.trim().toLowerCase();
+    if (cleaned.includes('kalamuzi') || cleaned.includes('karamuzi') || cleaned === 'admin') {
+      setSelectedRole('kalamuzi');
+    } else if (cleaned.includes('nahurira') || cleaned.includes('nahirira') || cleaned === 'hr') {
+      setSelectedRole('nahurira');
+    } else if (cleaned.includes('rose') || cleaned === 'recruiter') {
+      setSelectedRole('rose');
+    } else {
+      setSelectedRole('custom');
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
