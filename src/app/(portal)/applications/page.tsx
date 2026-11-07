@@ -18,6 +18,11 @@ import {
   ShieldCheck,
   AlertTriangle,
   Users,
+  LayoutGrid,
+  List,
+  Calendar,
+  Smartphone,
+  FileText,
 } from 'lucide-react';
 import { applicationsService } from '@/services';
 import { Application } from '@/types';
@@ -28,8 +33,16 @@ import {
   CriteriaWeights,
   DEFAULT_WEIGHTS,
 } from '@/components/candidate/CriteriaWeightSliders';
+import { SelfSchedulingModal } from '@/components/candidate/SelfSchedulingModal';
+import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPackModal';
+import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
+import { KanbanPipelineBoard } from '@/components/candidate/KanbanPipelineBoard';
+import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
+import { useBlindScreening } from '@/context/BlindScreeningContext';
 
 export default function AllApplicationsPage() {
+  const { isBlindMode, maskName, maskEmail } = useBlindScreening();
+
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -38,6 +51,9 @@ export default function AllApplicationsPage() {
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [bulkFeedback, setBulkFeedback] = useState<string | null>(null);
 
+  // View Mode: Table vs Visual Kanban Pipeline
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+
   // Comparison Matrix state
   const [comparisonOpen, setComparisonOpen] = useState(false);
 
@@ -45,8 +61,10 @@ export default function AllApplicationsPage() {
   const [slidersOpen, setSlidersOpen] = useState(false);
   const [criteriaWeights, setCriteriaWeights] = useState<CriteriaWeights>(DEFAULT_WEIGHTS);
 
-  // Batch communication confirmation state
-  const [invitationModalOpen, setInvitationModalOpen] = useState(false);
+  // Action Modals state (Self-Scheduling, Board Pack, WhatsApp)
+  const [schedulingCandidate, setSchedulingCandidate] = useState<Application | null>(null);
+  const [boardPackCandidate, setBoardPackCandidate] = useState<Application | null>(null);
+  const [whatsAppCandidate, setWhatsAppCandidate] = useState<Application | null>(null);
 
   useEffect(() => {
     async function fetchApps() {
@@ -96,11 +114,10 @@ export default function AllApplicationsPage() {
     if (expYears >= 5) delta += (w.experience - 25) * 0.4;
     if (hasCoreStack) delta += (w.techStack - 35) * 0.35;
 
-    const reRanked = Math.max(15, Math.min(99, Math.round(baseScore + delta)));
-    return reRanked;
+    return Math.max(15, Math.min(99, Math.round(baseScore + delta)));
   };
 
-  // Re-rank candidates in real time whenever weights change
+  // Live re-ranking
   const displayedApplications = useMemo(() => {
     return [...applications].sort((a, b) => {
       const scoreA = calculateDynamicScore(a, criteriaWeights);
@@ -124,7 +141,6 @@ export default function AllApplicationsPage() {
     setSelectedIds(next);
   };
 
-  // One-Click Mass Decision Selection Presets
   const handleSelectPreset = (type: 'QUALIFIED' | 'BORDERLINE' | 'INELIGIBLE') => {
     const matched = new Set<string>();
     displayedApplications.forEach((app) => {
@@ -159,13 +175,12 @@ export default function AllApplicationsPage() {
             reviewerName: 'MR. KALAMUZI',
             decision: decision === 'SHORTLISTED' ? 'SHORTLIST' : 'REJECT',
             reason: withEmailNotification
-              ? `One-Click Mass Action: ${decision === 'SHORTLISTED' ? 'Shortlisted and dispatched interview invitations' : 'Polite update dispatched'}`
+              ? `One-Click Mass Action: ${decision === 'SHORTLISTED' ? 'Shortlisted and generated interview booking links' : 'Polite update dispatched'}`
               : `Bulk decision applied by reviewer on ${new Date().toLocaleDateString()}`,
           })
         )
       );
 
-      // Optimistic update
       setApplications((prev) =>
         prev.map((app) =>
           selectedIds.has(app.id)
@@ -175,20 +190,6 @@ export default function AllApplicationsPage() {
                   decision === 'SHORTLISTED'
                     ? ('SHORTLISTED' as any)
                     : ('REJECTED_AFTER_REVIEW' as any),
-                reviewDecisions: [
-                  {
-                    id: 'bulk-' + Date.now(),
-                    applicationId: app.id,
-                    reviewerId: 'usr-admin-001',
-                    reviewerName: 'MR. KALAMUZI',
-                    decision: decision === 'SHORTLISTED' ? 'SHORTLIST' : 'REJECT',
-                    reason: withEmailNotification
-                      ? 'Mass Decision & Dispatched Communication'
-                      : 'Bulk action applied',
-                    createdAt: new Date().toISOString(),
-                  },
-                  ...(app.reviewDecisions || []),
-                ],
               }
             : app
         )
@@ -196,7 +197,7 @@ export default function AllApplicationsPage() {
 
       setBulkFeedback(
         withEmailNotification
-          ? `⚡ Success! Shortlisted ${selectedIds.size} candidates and dispatched formal interview invitations!`
+          ? `⚡ Success! Shortlisted ${selectedIds.size} candidates and dispatched self-scheduling invitation links!`
           : `Successfully marked ${selectedIds.size} candidates as ${decision.toLowerCase()}.`
       );
       setSelectedIds(new Set());
@@ -226,8 +227,8 @@ export default function AllApplicationsPage() {
     ];
     const rows = targetApps.map((a, i) => [
       `"#${i + 1}"`,
-      `"${a.applicant.fullName}"`,
-      `"${a.applicant.email}"`,
+      `"${maskName(a.applicant.fullName, a.id)}"`,
+      `"${maskEmail(a.applicant.email)}"`,
       `"${a.jobTitle || a.jobId}"`,
       `"${a.screeningRun?.mandatoryStatus ?? 'N/A'}"`,
       `${calculateDynamicScore(a, criteriaWeights)}%`,
@@ -259,30 +260,60 @@ export default function AllApplicationsPage() {
             Candidate Applications & Screening
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Review applicant qualifications, compare candidates head-to-head, and execute 1-click batch decisions.
+            Review applicant qualifications, compare candidates head-to-head, and manage visual pipeline stages.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* View Mode Switcher: Table vs Visual Kanban */}
+          <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl flex items-center gap-1 border border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'table'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('kanban')}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                viewMode === 'kanban'
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>Kanban</span>
+            </button>
+          </div>
+
+          <BlindScreeningToggle />
+
           <button
             type="button"
             onClick={() => setSlidersOpen(!slidersOpen)}
-            className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border shadow-sm transition-all ${
+            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border shadow-sm transition-all ${
               slidersOpen
                 ? 'bg-indigo-600 text-white border-indigo-600'
-                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50'
             }`}
           >
-            <Sliders className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
-            <span>Criteria Sliders & Re-Ranking</span>
+            <Sliders className="w-3.5 h-3.5 text-indigo-500" />
+            <span>Criteria Sliders</span>
           </button>
 
           <button
             onClick={handleExportCsv}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-sm transition-all"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-semibold shadow-sm transition-all"
           >
-            <Download className="w-4 h-4 text-slate-500 dark:text-slate-400" />
-            Export CSV ({selectedIds.size > 0 ? `${selectedIds.size} Selected` : 'All'})
+            <Download className="w-3.5 h-3.5 text-slate-400" />
+            Export CSV
           </button>
         </div>
       </div>
@@ -346,8 +377,8 @@ export default function AllApplicationsPage() {
               disabled={bulkActionLoading}
               className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/30 transition-all disabled:opacity-50"
             >
-              <Mail className="w-4 h-4" />
-              Batch Shortlist & Send Invites
+              <Calendar className="w-4 h-4" />
+              Batch Shortlist & Send Self-Schedule Links
             </button>
 
             {/* Mass Polite Update */}
@@ -408,7 +439,7 @@ export default function AllApplicationsPage() {
           </div>
         </div>
 
-        {/* Feature 6: One-Click Quick Selection Filter Bar */}
+        {/* 1-Click Selection Filter Bar */}
         <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 flex-wrap text-xs">
           <span className="text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
             1-Click Selection Presets:
@@ -437,151 +468,196 @@ export default function AllApplicationsPage() {
         </div>
       </div>
 
-      {/* Candidates Data Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
-        {loading ? (
-          <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm">
-            Loading applications...
-          </div>
-        ) : displayedApplications.length === 0 ? (
-          <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm">
-            No applications found matching the selected filter.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs uppercase border-b border-slate-100 dark:border-slate-800">
-                <tr>
-                  <th className="px-4 py-3.5 w-10 text-center">
-                    <button
-                      type="button"
-                      onClick={toggleSelectAll}
-                      className="text-slate-400 hover:text-indigo-600"
-                    >
-                      {selectedIds.size === displayedApplications.length &&
-                      displayedApplications.length > 0 ? (
-                        <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                      ) : (
-                        <Square className="w-4 h-4" />
-                      )}
-                    </button>
-                  </th>
-                  <th className="px-3 py-3.5 w-12 font-medium text-center">Rank</th>
-                  <th className="px-6 py-3.5 font-medium">Candidate</th>
-                  <th className="px-6 py-3.5 font-medium">Position</th>
-                  <th className="px-6 py-3.5 font-medium">Mandatory Check</th>
-                  <th className="px-6 py-3.5 font-medium">Weighted Match</th>
-                  <th className="px-6 py-3.5 font-medium">Red Flag Radar</th>
-                  <th className="px-6 py-3.5 font-medium">Status</th>
-                  <th className="px-6 py-3.5 font-medium text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {displayedApplications.map((app, index) => {
-                  const isChecked = selectedIds.has(app.id);
-                  const dynamicScore = calculateDynamicScore(app, criteriaWeights);
-                  const scoreColor =
-                    dynamicScore >= 85
-                      ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800'
-                      : dynamicScore >= 70
-                      ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800'
-                      : 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800';
+      {/* Main Candidate Views: Table View vs Option 3 Visual Kanban Board */}
+      {viewMode === 'kanban' ? (
+        <KanbanPipelineBoard
+          applications={displayedApplications}
+          onOpenSchedule={(app) => setSchedulingCandidate(app)}
+          onOpenWhatsApp={(app) => setWhatsAppCandidate(app)}
+          onOpenBoardPack={(app) => setBoardPackCandidate(app)}
+          onStageChange={(id, colId) => {
+            setBulkFeedback(`Candidate stage updated to ${colId}!`);
+          }}
+        />
+      ) : (
+        /* Candidates Data Table */
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+          {loading ? (
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm">
+              Loading applications...
+            </div>
+          ) : displayedApplications.length === 0 ? (
+            <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-sm">
+              No applications found matching the selected filter.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 text-xs uppercase border-b border-slate-100 dark:border-slate-800">
+                  <tr>
+                    <th className="px-4 py-3.5 w-10 text-center">
+                      <button
+                        type="button"
+                        onClick={toggleSelectAll}
+                        className="text-slate-400 hover:text-indigo-600"
+                      >
+                        {selectedIds.size === displayedApplications.length &&
+                        displayedApplications.length > 0 ? (
+                          <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                        ) : (
+                          <Square className="w-4 h-4" />
+                        )}
+                      </button>
+                    </th>
+                    <th className="px-3 py-3.5 w-12 font-medium text-center">Rank</th>
+                    <th className="px-6 py-3.5 font-medium">Candidate</th>
+                    <th className="px-6 py-3.5 font-medium">Position</th>
+                    <th className="px-6 py-3.5 font-medium">Mandatory Check</th>
+                    <th className="px-6 py-3.5 font-medium">Weighted Match</th>
+                    <th className="px-6 py-3.5 font-medium">Red Flag Radar</th>
+                    <th className="px-6 py-3.5 font-medium">Status</th>
+                    <th className="px-6 py-3.5 font-medium text-right">Quick Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {displayedApplications.map((app, index) => {
+                    const isChecked = selectedIds.has(app.id);
+                    const dynamicScore = calculateDynamicScore(app, criteriaWeights);
+                    const scoreColor =
+                      dynamicScore >= 85
+                        ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border-emerald-200 dark:border-emerald-800'
+                        : dynamicScore >= 70
+                        ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 border-blue-200 dark:border-blue-800'
+                        : 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800';
 
-                  // Anomaly detection check
-                  const hasAnomaly =
-                    app.screeningRun?.mandatoryStatus === 'DOES_NOT_MEET' ||
-                    app.candidateProfile?.employmentHistory.some(
-                      (e, i) => i > 0 && e.yearsExperience === 0
-                    );
+                    const hasAnomaly =
+                      app.screeningRun?.mandatoryStatus === 'DOES_NOT_MEET' ||
+                      app.candidateProfile?.employmentHistory.some(
+                        (e, i) => i > 0 && e.yearsExperience === 0
+                      );
 
-                  return (
-                    <tr
-                      key={app.id}
-                      className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
-                        isChecked ? 'bg-indigo-50/40 dark:bg-indigo-950/30' : ''
-                      }`}
-                    >
-                      <td className="px-4 py-4 text-center">
-                        <button
-                          type="button"
-                          onClick={() => toggleSelectOne(app.id)}
-                          className="text-slate-400 hover:text-indigo-600"
-                        >
-                          {isChecked ? (
-                            <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                    return (
+                      <tr
+                        key={app.id}
+                        className={`hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors ${
+                          isChecked ? 'bg-indigo-50/40 dark:bg-indigo-950/30' : ''
+                        }`}
+                      >
+                        <td className="px-4 py-4 text-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleSelectOne(app.id)}
+                            className="text-slate-400 hover:text-indigo-600"
+                          >
+                            {isChecked ? (
+                              <CheckSquare className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                            ) : (
+                              <Square className="w-4 h-4" />
+                            )}
+                          </button>
+                        </td>
+                        <td className="px-3 py-4 text-center">
+                          <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
+                            #{index + 1}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-slate-900 dark:text-white">
+                            {maskName(app.applicant.fullName, app.id)}
+                          </div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            {maskEmail(app.applicant.email)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-xs font-medium text-slate-700 dark:text-slate-300">
+                          {app.jobTitle || app.jobId}
+                        </td>
+                        <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-300">
+                          {app.screeningRun?.mandatoryStatus === 'MEETS' ? (
+                            <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Satisfied
+                            </span>
+                          ) : app.screeningRun?.mandatoryStatus === 'DOES_NOT_MEET' ? (
+                            <span className="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">
+                              <XCircle className="w-3.5 h-3.5" /> Does Not Meet
+                            </span>
                           ) : (
-                            <Square className="w-4 h-4" />
+                            <span className="text-slate-500">Pending Review</span>
                           )}
-                        </button>
-                      </td>
-                      <td className="px-3 py-4 text-center">
-                        <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
-                          #{index + 1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-900 dark:text-white">
-                          {app.applicant.fullName}
-                        </div>
-                        <div className="text-xs text-slate-500 dark:text-slate-400">
-                          {app.applicant.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-xs font-medium text-slate-700 dark:text-slate-300">
-                        {app.jobTitle || app.jobId}
-                      </td>
-                      <td className="px-6 py-4 text-xs text-slate-600 dark:text-slate-300">
-                        {app.screeningRun?.mandatoryStatus === 'MEETS' ? (
-                          <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Satisfied
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`font-mono font-bold text-xs px-2.5 py-1 rounded-lg border ${scoreColor}`}
+                          >
+                            {dynamicScore}%
                           </span>
-                        ) : app.screeningRun?.mandatoryStatus === 'DOES_NOT_MEET' ? (
-                          <span className="inline-flex items-center gap-1 font-semibold text-rose-600 dark:text-rose-400">
-                            <XCircle className="w-3.5 h-3.5" /> Does Not Meet
-                          </span>
-                        ) : (
-                          <span className="text-slate-500">Pending Review</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`font-mono font-bold text-xs px-2.5 py-1 rounded-lg border ${scoreColor}`}
-                        >
-                          {dynamicScore}%
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {hasAnomaly ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                            <AlertTriangle className="w-3 h-3 text-amber-500" />
-                            Anomaly Flag
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                            Clean
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusBadge status={app.status} type="decision" />
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Link
-                          href={`/applications/${app.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition-all"
-                        >
-                          Review <ChevronRight className="w-3 h-3" />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          {hasAnomaly ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                              <AlertTriangle className="w-3 h-3 text-amber-500" />
+                              Anomaly Flag
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                              Clean
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadge status={app.status} type="decision" />
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            {/* Option 1: Schedule Link button */}
+                            <button
+                              type="button"
+                              onClick={() => setSchedulingCandidate(app)}
+                              className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="Generate Interview Self-Scheduling Link"
+                            >
+                              <Calendar className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Option 4: WhatsApp Outreach button */}
+                            <button
+                              type="button"
+                              onClick={() => setWhatsAppCandidate(app)}
+                              className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="Send WhatsApp or SMS Alert"
+                            >
+                              <Smartphone className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Option 2: Executive Board Pack button */}
+                            <button
+                              type="button"
+                              onClick={() => setBoardPackCandidate(app)}
+                              className="p-1.5 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="Generate Executive Board Pack Dossier"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* View Detail Link */}
+                            <Link
+                              href={`/applications/${app.id}`}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs font-semibold transition-all ml-1"
+                            >
+                              Review <ChevronRight className="w-3 h-3" />
+                            </Link>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Feature 5: Head-to-Head Comparison Modal */}
       <CandidateComparisonModal
@@ -593,6 +669,42 @@ export default function AllApplicationsPage() {
           handleBulkDecision('SHORTLISTED', false);
         }}
       />
+
+      {/* Option 1: Self-Scheduling Modal */}
+      {schedulingCandidate && (
+        <SelfSchedulingModal
+          isOpen={!!schedulingCandidate}
+          onClose={() => setSchedulingCandidate(null)}
+          candidateName={schedulingCandidate.applicant.fullName}
+          candidateEmail={schedulingCandidate.applicant.email}
+          candidatePhone={schedulingCandidate.applicant.phone}
+          jobTitle={schedulingCandidate.jobTitle || 'Engineering Position'}
+          onScheduleConfirmed={(slot) => {
+            setBulkFeedback(`Interview confirmed with ${schedulingCandidate.applicant.fullName} for ${slot}!`);
+          }}
+        />
+      )}
+
+      {/* Option 2: Executive Board Pack Modal */}
+      {boardPackCandidate && (
+        <ExecutiveBoardPackModal
+          isOpen={!!boardPackCandidate}
+          onClose={() => setBoardPackCandidate(null)}
+          application={boardPackCandidate}
+          jobTitle={boardPackCandidate.jobTitle}
+        />
+      )}
+
+      {/* Option 4: WhatsApp & SMS Outreach Modal */}
+      {whatsAppCandidate && (
+        <WhatsAppSmsOutreachModal
+          isOpen={!!whatsAppCandidate}
+          onClose={() => setWhatsAppCandidate(null)}
+          candidateName={whatsAppCandidate.applicant.fullName}
+          candidatePhone={whatsAppCandidate.applicant.phone}
+          jobTitle={whatsAppCandidate.jobTitle || 'Engineering Position'}
+        />
+      )}
     </div>
   );
 }

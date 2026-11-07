@@ -16,6 +16,7 @@ import {
 import { authService, activeUser } from '@/services/auth';
 import { User } from '@/types';
 import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { HireAgentLogo } from '@/components/brand/HireAgentLogo';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
 
@@ -302,6 +303,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 Ctrl K
               </kbd>
             </button>
+
+            {/* Blind Screening Toggle (Bias-Free DEI Mode) */}
+            <BlindScreeningToggle />
 
             {/* Theme Toggle Button (Light/Dark mode) */}
             <ThemeToggle />

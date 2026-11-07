@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { BlindScreeningProvider } from '@/context/BlindScreeningContext';
 
 export const metadata: Metadata = {
   title: 'HIRE~Agent | AI Recruitment & Candidate Screening',
@@ -22,7 +23,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <BlindScreeningProvider>{children}</BlindScreeningProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

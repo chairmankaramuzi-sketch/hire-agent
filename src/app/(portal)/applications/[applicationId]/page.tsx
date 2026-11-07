@@ -25,7 +25,12 @@ import { StatusBadge } from '@/components/ui/Badge';
 import { InterviewQuestionGenerator } from '@/components/candidate/InterviewQuestionGenerator';
 import { EmailDrafterModal } from '@/components/candidate/EmailDrafterModal';
 import { ExecutiveXRayCard } from '@/components/candidate/ExecutiveXRayCard';
-import { Mail, Printer, Sparkles } from 'lucide-react';
+import { SelfSchedulingModal } from '@/components/candidate/SelfSchedulingModal';
+import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPackModal';
+import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
+import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
+import { useBlindScreening } from '@/context/BlindScreeningContext';
+import { Mail, Printer, Sparkles, Calendar, Smartphone } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 
 export default function ApplicationDetailPage({
@@ -56,8 +61,14 @@ export default function ApplicationDetailPage({
   const [downloadingCv, setDownloadingCv] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
+  // Blind Screening context
+  const { isBlindMode, maskName, maskEmail, maskPhone, maskInstitution } = useBlindScreening();
+
   // AI Outreach & Workbench states
   const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [schedulingModalOpen, setSchedulingModalOpen] = useState(false);
+  const [boardPackModalOpen, setBoardPackModalOpen] = useState(false);
+  const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
   const [highlightedEvidence, setHighlightedEvidence] = useState<string | null>(null);
 
   const handleDownloadCv = async () => {
@@ -254,20 +265,56 @@ export default function ApplicationDetailPage({
               <StatusBadge status={application.status} type="decision" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mt-0.5">
-              {application.applicant.fullName}
+              {maskName(application.applicant.fullName, application.id)}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Blind Screening Toggle */}
+          <BlindScreeningToggle />
+
+          {/* Option 1: Self-Scheduling Interview Link */}
+          <button
+            type="button"
+            onClick={() => setSchedulingModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold shadow-sm transition-all"
+            title="Generate personalized self-service scheduling link"
+          >
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Self-Schedule</span>
+          </button>
+
+          {/* Option 4: WhatsApp & SMS Mobile Outreach */}
+          <button
+            type="button"
+            onClick={() => setWhatsAppModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold shadow-sm transition-all"
+            title="Send WhatsApp or SMS message"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span>WhatsApp</span>
+          </button>
+
+          {/* Option 2: Executive Board Pack */}
+          <button
+            type="button"
+            onClick={() => setBoardPackModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/70 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold shadow-sm transition-all"
+            title="Generate Board Dossier for Directors"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            <span>Board Pack</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setEmailModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold shadow-sm transition-all"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-semibold shadow-sm transition-all"
             title="Draft email invitation or feedback to candidate"
           >
             <Mail className="w-3.5 h-3.5" />
-            <span>Draft Outreach Email</span>
+            <span className="hidden sm:inline">Email Draft</span>
           </button>
 
           <button
@@ -277,7 +324,7 @@ export default function ApplicationDetailPage({
             title="Print or export candidate brief"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Print Brief</span>
+            <span className="hidden sm:inline">Print</span>
           </button>
 
           {run && (
@@ -712,6 +759,37 @@ export default function ApplicationDetailPage({
         jobTitle={job?.title ?? 'Engineering Role'}
         reviewerName={currentUser.name}
         score={run?.totalScore ?? 0}
+      />
+
+      {/* Option 1: Self-Scheduling Modal */}
+      <SelfSchedulingModal
+        isOpen={schedulingModalOpen}
+        onClose={() => setSchedulingModalOpen(false)}
+        candidateName={application.applicant.fullName}
+        candidateEmail={application.applicant.email}
+        candidatePhone={application.applicant.phone}
+        jobTitle={job?.title ?? 'Engineering Role'}
+        onScheduleConfirmed={(slot) => {
+          setDecisionSuccess(`Interview confirmed with candidate for ${slot}!`);
+        }}
+      />
+
+      {/* Option 2: Executive Board Pack Modal */}
+      <ExecutiveBoardPackModal
+        isOpen={boardPackModalOpen}
+        onClose={() => setBoardPackModalOpen(false)}
+        application={application}
+        jobTitle={job?.title}
+        department={job?.department}
+      />
+
+      {/* Option 4: WhatsApp & SMS Outreach Modal */}
+      <WhatsAppSmsOutreachModal
+        isOpen={whatsAppModalOpen}
+        onClose={() => setWhatsAppModalOpen(false)}
+        candidateName={application.applicant.fullName}
+        candidatePhone={application.applicant.phone}
+        jobTitle={job?.title ?? 'Engineering Role'}
       />
     </div>
   );
