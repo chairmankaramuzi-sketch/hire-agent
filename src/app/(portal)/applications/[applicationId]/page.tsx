@@ -24,6 +24,7 @@ import { Application, Job, ReviewDecisionType, User } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { InterviewQuestionGenerator } from '@/components/candidate/InterviewQuestionGenerator';
 import { EmailDrafterModal } from '@/components/candidate/EmailDrafterModal';
+import { ExecutiveXRayCard } from '@/components/candidate/ExecutiveXRayCard';
 import { Mail, Printer, Sparkles } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 
@@ -108,6 +109,44 @@ export default function ApplicationDetailPage({
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Click-to-Proof Verification handler
+  const handleProofClick = (evidenceText: string) => {
+    setHighlightedEvidence(evidenceText);
+    const el = document.getElementById('click-to-proof-viewer');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      const fallback = document.getElementById('candidate-profile-summary');
+      if (fallback) fallback.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Quick Executive Decision handler from X-Ray
+  const handleQuickAction = async (actionType: 'SHORTLIST' | 'ADVANCE' | 'REJECT') => {
+    setDecision(actionType);
+    const generatedReason = `Executive ${actionType.toLowerCase()} decision recorded via 30-Second X-Ray on ${new Date().toLocaleDateString()}`;
+    setReason(generatedReason);
+    setDecisionSubmitting(true);
+    setDecisionError(null);
+    setDecisionSuccess(null);
+
+    try {
+      const updated = await applicationsService.addReviewDecision({
+        applicationId,
+        reviewerId: currentUser.id || 'usr-hr-001',
+        reviewerName: currentUser.name || 'Jane Doe',
+        decision: actionType,
+        reason: generatedReason,
+      });
+      setApplication(updated);
+      setDecisionSuccess(`Candidate marked as '${actionType}'!`);
+    } catch (err: unknown) {
+      setDecisionError(err instanceof Error ? err.message : 'Action failed');
+    } finally {
+      setDecisionSubmitting(false);
+    }
+  };
 
   const handleDecisionSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -276,6 +315,13 @@ export default function ApplicationDetailPage({
         </div>
       )}
 
+      {/* 30-Second Executive X-Ray Snapshot */}
+      <ExecutiveXRayCard
+        application={application}
+        onProofClick={handleProofClick}
+        onQuickAction={handleQuickAction}
+      />
+
       {/* Main Grid: Left = Evaluation & Profile, Right = Decision & CV */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column (2 Cols) */}
@@ -337,14 +383,10 @@ export default function ApplicationDetailPage({
                         <div className="pt-1">
                           <button
                             type="button"
-                            onClick={() => {
-                              setHighlightedEvidence(result.evidenceText || null);
-                              const el = document.getElementById('candidate-profile-summary');
-                              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }}
-                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
+                            onClick={() => handleProofClick(result.evidenceText || '')}
+                            className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
                           >
-                            <span>🔍 Click to highlight in candidate profile</span>
+                            <span>🔍 Click-to-Proof: Highlight exact sentence in resume</span>
                           </button>
                         </div>
                         {result.confidenceScore && (
@@ -378,20 +420,36 @@ export default function ApplicationDetailPage({
               id="candidate-profile-summary"
               className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 space-y-5 transition-colors"
             >
+              {/* Click-to-Proof Verification Panel (Zero Second-Guessing) */}
               {highlightedEvidence && (
-                <div className="p-3.5 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/90 border-2 border-indigo-500 text-indigo-950 dark:text-indigo-200 text-xs flex items-start justify-between gap-3 animate-in fade-in">
-                  <div>
-                    <span className="font-bold flex items-center gap-1.5 text-indigo-700 dark:text-indigo-300 mb-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Verified Citation Excerpt:
+                <div
+                  id="click-to-proof-viewer"
+                  className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-indigo-50/70 dark:from-amber-950/50 dark:to-indigo-950/50 border-2 border-amber-400 dark:border-amber-500 shadow-md text-xs space-y-2 animate-in fade-in"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold flex items-center gap-2 text-amber-900 dark:text-amber-200 uppercase tracking-wide text-[11px]">
+                      <Sparkles className="w-4 h-4 text-amber-500" />
+                      Click-to-Proof Verification (Zero Second-Guessing)
                     </span>
-                    <p className="italic font-medium text-slate-800 dark:text-slate-100">&ldquo;{highlightedEvidence}&rdquo;</p>
+                    <button
+                      onClick={() => setHighlightedEvidence(null)}
+                      className="text-xs font-bold text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-100 px-2 py-0.5 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                    >
+                      Dismiss Highlight
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setHighlightedEvidence(null)}
-                    className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline px-2 py-1"
-                  >
-                    Clear
-                  </button>
+                  <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-800/80 shadow-inner">
+                    <p className="text-slate-500 dark:text-slate-400 text-[11px] mb-1 font-semibold">
+                      Exact sentence verified from candidate CV:
+                    </p>
+                    <mark className="bg-amber-200 dark:bg-amber-500/40 text-slate-950 dark:text-white px-2 py-1 rounded-md font-semibold text-xs leading-relaxed inline-block">
+                      &ldquo;{highlightedEvidence}&rdquo;
+                    </mark>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>The Director never has to manually Ctrl+F through a PDF—the proof is right in front of you.</span>
+                  </p>
                 </div>
               )}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
