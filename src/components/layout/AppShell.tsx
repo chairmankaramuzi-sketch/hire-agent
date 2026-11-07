@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Briefcase,
@@ -27,14 +27,28 @@ const navItems = [
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<User>(activeUser);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    authService.getCurrentUser().then((u) => setCurrentUser(u));
-  }, []);
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('talentscreen_auth_user');
+      if (!stored) {
+        router.replace('/login');
+        return;
+      }
+    }
+    authService.getCurrentUser().then((u) => {
+      if (!u) {
+        router.replace('/login');
+      } else {
+        setCurrentUser(u);
+      }
+    });
+  }, [router]);
 
   // Auto-close mobile drawer when user navigates to a new page
   useEffect(() => {
