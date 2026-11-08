@@ -63,7 +63,7 @@ export async function PATCH(
   }
 
   // Ensure user exists and save review audit note
-  await prisma.$transaction(async tx => {
+  await prisma.$transaction(async (tx: any) => {
     const existingReviewer = await tx.appUser.findFirst({
       where: {
         OR: [

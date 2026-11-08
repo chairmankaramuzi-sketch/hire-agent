@@ -4,3 +4,6 @@ export * from './applications';
 export * from './auth';
 export * from './system';
 export * from './notifications';
+export * from './calendarService';
+export * from './emailService';
+export * from './approvalService';

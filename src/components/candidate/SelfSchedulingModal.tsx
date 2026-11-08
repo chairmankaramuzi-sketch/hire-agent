@@ -331,6 +331,37 @@ export function SelfSchedulingModal({
                       Calendar invites dispatched to <strong>{candidateEmail}</strong> and <strong>{interviewer}</strong>.
                     </p>
                   </div>
+
+                  {/* One-click Calendar Sync Buttons */}
+                  <div className="flex items-center justify-center gap-2 pt-2 flex-wrap">
+                    <a
+                      href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+                        `Interview: ${jobTitle} - ${candidateName}`
+                      )}&details=${encodeURIComponent(
+                        `Technical conversation with ${interviewer}.\nPlatform: ${platform}`
+                      )}&location=${encodeURIComponent(platform)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 flex items-center gap-1.5 shadow-xs"
+                    >
+                      <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Add to Google Cal</span>
+                    </a>
+
+                    <a
+                      href={`https://outlook.live.com/calendar/0/deeplink/compose?path=/calendar/action/compose&rru=addevent&subject=${encodeURIComponent(
+                        `Interview: ${jobTitle} - ${candidateName}`
+                      )}&body=${encodeURIComponent(
+                        `Technical conversation with ${interviewer}.\nPlatform: ${platform}`
+                      )}&location=${encodeURIComponent(platform)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 flex items-center gap-1.5 shadow-xs"
+                    >
+                      <CalendarCheck className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Add to Outlook</span>
+                    </a>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {

@@ -94,7 +94,7 @@ export async function POST(
   });
 
   // 6. Create Application and CV Asset in atomic transaction
-  const created = await prisma.$transaction(async tx => {
+  const created = await prisma.$transaction(async (tx: any) => {
     // If applicant is logged in, link user ID
     const applicantUserId =
       session && session.role === UserRole.APPLICANT ? session.userId : null;

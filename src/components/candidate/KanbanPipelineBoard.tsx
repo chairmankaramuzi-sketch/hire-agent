@@ -25,6 +25,7 @@ interface KanbanPipelineBoardProps {
   onOpenSchedule?: (application: Application) => void;
   onOpenWhatsApp?: (application: Application) => void;
   onOpenBoardPack?: (application: Application) => void;
+  onOpenPreScreen?: (application: Application) => void;
 }
 
 interface ColumnDef {
@@ -40,6 +41,7 @@ export function KanbanPipelineBoard({
   onOpenSchedule,
   onOpenWhatsApp,
   onOpenBoardPack,
+  onOpenPreScreen,
 }: KanbanPipelineBoardProps) {
   const { maskName } = useBlindScreening();
 
@@ -199,6 +201,17 @@ export function KanbanPipelineBoard({
                           </Link>
 
                           <div className="flex items-center gap-1">
+                            {onOpenPreScreen && (
+                              <button
+                                type="button"
+                                onClick={() => onOpenPreScreen(app)}
+                                className="p-1 text-slate-400 hover:text-purple-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+                                title="AI Pre-Screening Interview & Scorecard"
+                              >
+                                <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                              </button>
+                            )}
+
                             {onOpenSchedule && (
                               <button
                                 type="button"

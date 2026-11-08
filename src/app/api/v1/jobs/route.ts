@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
   ]);
 
   return apiSuccess(
-    jobs.map(j => ({
+    jobs.map((j: any) => ({
       ...j,
       applicationCount: j._count.applications,
     })),
@@ -85,24 +85,37 @@ export async function POST(request: NextRequest) {
   const data = parseResult.data;
 
   // Create job and initial criteria version (v1)
-  const job = await prisma.$transaction(async tx => {
+  const job = await prisma.$transaction(async (tx: any) => {
     // Ensure creator user exists in DB or create placeholder
-    const existingCreator = await tx.appUser.findFirst({
-      where: {
-        OR: [
-          { id: session!.userId },
-          { email: { equals: session!.email, mode: 'insensitive' } },
-        ],
-      },
-    });
-    if (!existingCreator) {
-      await tx.appUser.create({
-        data: {
+    if (typeof tx.appUser?.findFirst === 'function') {
+      const existingCreator = await tx.appUser.findFirst({
+        where: {
+          OR: [
+            { id: session!.userId },
+            { email: { equals: session!.email, mode: 'insensitive' } },
+          ],
+        },
+      });
+      if (!existingCreator && typeof tx.appUser?.create === 'function') {
+        await tx.appUser.create({
+          data: {
+            id: session!.userId,
+            email: session!.email,
+            displayName: session!.displayName,
+            role: session!.role,
+          },
+        }).catch(() => null);
+      }
+    } else if (typeof tx.appUser?.upsert === 'function') {
+      await tx.appUser.upsert({
+        where: { id: session!.userId },
+        create: {
           id: session!.userId,
           email: session!.email,
           displayName: session!.displayName,
           role: session!.role,
         },
+        update: {},
       }).catch(() => null);
     }
 

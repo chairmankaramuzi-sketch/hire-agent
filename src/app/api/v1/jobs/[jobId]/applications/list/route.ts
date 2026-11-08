@@ -55,7 +55,7 @@ export async function GET(
   ]);
 
   return apiSuccess(
-    applications.map(app => ({
+    applications.map((app: any) => ({
       id: app.id,
       jobId: app.jobId,
       applicantName: app.applicantName,

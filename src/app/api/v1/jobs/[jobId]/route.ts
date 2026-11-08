@@ -79,11 +79,11 @@ export async function PATCH(
 
   const data = parseResult.data;
 
-  const updatedJob = await prisma.$transaction(async tx => {
+  const updatedJob = await prisma.$transaction(async (tx: any) => {
     // If criteria are provided, version them up: deactivate old active criteria and insert new version
     if (data.criteria) {
       const latestVersion = existingJob.criteria.reduce(
-        (max, c) => (c.version > max ? c.version : max),
+        (max: number, c: any) => (c.version > max ? c.version : max),
         1
       );
       const nextVersion = latestVersion + 1;

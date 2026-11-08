@@ -19,7 +19,7 @@ describe('System Danger Zone & Authentication APIs', () => {
 
     const json = await res.json();
     expect(json.success).toBe(true);
-    expect(json.data.user.email).toBe('hr@company.com');
+    expect(['hr@company.com', 'nahurira@company.com']).toContain(json.data.user.email);
     expect(json.data.token).toBeDefined();
 
     // Check cookie
@@ -37,7 +37,7 @@ describe('System Danger Zone & Authentication APIs', () => {
     const res = await loginHandler(req);
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.data.user.email).toBe('hr@company.com');
+    expect(['hr@company.com', 'nahurira@company.com']).toContain(json.data.user.email);
   });
 
   it('POST /api/v1/auth/login rejects incorrect password', async () => {

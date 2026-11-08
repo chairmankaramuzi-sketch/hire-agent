@@ -36,9 +36,11 @@ import {
 import { SelfSchedulingModal } from '@/components/candidate/SelfSchedulingModal';
 import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPackModal';
 import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
+import { AiPreScreeningModal } from '@/components/candidate/AiPreScreeningModal';
 import { KanbanPipelineBoard } from '@/components/candidate/KanbanPipelineBoard';
 import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
+import { approvalService } from '@/services/approvalService';
 
 export default function AllApplicationsPage() {
   const { isBlindMode, maskName, maskEmail } = useBlindScreening();
@@ -68,10 +70,11 @@ export default function AllApplicationsPage() {
   const [slidersOpen, setSlidersOpen] = useState(false);
   const [criteriaWeights, setCriteriaWeights] = useState<CriteriaWeights>(DEFAULT_WEIGHTS);
 
-  // Action Modals state (Self-Scheduling, Board Pack, WhatsApp)
+  // Action Modals state (Self-Scheduling, Board Pack, WhatsApp, AI Pre-Screen)
   const [schedulingCandidate, setSchedulingCandidate] = useState<Application | null>(null);
   const [boardPackCandidate, setBoardPackCandidate] = useState<Application | null>(null);
   const [whatsAppCandidate, setWhatsAppCandidate] = useState<Application | null>(null);
+  const [preScreenCandidate, setPreScreenCandidate] = useState<Application | null>(null);
 
   useEffect(() => {
     async function fetchApps() {
@@ -495,6 +498,7 @@ export default function AllApplicationsPage() {
           onOpenSchedule={(app) => setSchedulingCandidate(app)}
           onOpenWhatsApp={(app) => setWhatsAppCandidate(app)}
           onOpenBoardPack={(app) => setBoardPackCandidate(app)}
+          onOpenPreScreen={(app) => setPreScreenCandidate(app)}
           onStageChange={(id, colId) => {
             setBulkFeedback(`Candidate stage updated to ${colId}!`);
           }}
@@ -627,9 +631,37 @@ export default function AllApplicationsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <StatusBadge status={app.status} type="decision" />
+                          {(() => {
+                            const stage = approvalService.getApprovalState(app.id).currentStage;
+                            const stageMap: Record<string, { label: string; color: string }> = {
+                              RECRUITER_SCREENING: { label: 'Screening', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
+                              RECRUITER_PROPOSED: { label: 'Proposed', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300' },
+                              DIRECTOR_APPROVED: { label: 'Director OK', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300' },
+                              EXECUTIVE_AUTHORIZED: { label: 'Exec Signed', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 font-bold' },
+                              REVISION_REQUESTED: { label: 'Revision', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300' },
+                            };
+                            const info = stageMap[stage] || { label: stage, color: 'bg-slate-100 text-slate-700' };
+                            return (
+                              <div className="mt-1">
+                                <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-md ${info.color}`}>
+                                  {info.label}
+                                </span>
+                              </div>
+                            );
+                          })()}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="inline-flex items-center gap-1.5">
+                            {/* Option C: AI Pre-Screening button */}
+                            <button
+                              type="button"
+                              onClick={() => setPreScreenCandidate(app)}
+                              className="p-1.5 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="AI Asynchronous Pre-Screening Scorecard & Invite"
+                            >
+                              <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                            </button>
+
                             {/* Option 1: Schedule Link button */}
                             <button
                               type="button"
@@ -723,6 +755,19 @@ export default function AllApplicationsPage() {
           candidateName={whatsAppCandidate.applicant.fullName}
           candidatePhone={whatsAppCandidate.applicant.phone}
           jobTitle={whatsAppCandidate.jobTitle || 'Engineering Position'}
+        />
+      )}
+
+      {/* Option C: AI Pre-Screening Modal */}
+      {preScreenCandidate && (
+        <AiPreScreeningModal
+          isOpen={!!preScreenCandidate}
+          onClose={() => setPreScreenCandidate(null)}
+          applicationId={preScreenCandidate.id}
+          candidateName={preScreenCandidate.applicant.fullName}
+          candidateEmail={preScreenCandidate.applicant.email}
+          candidatePhone={preScreenCandidate.applicant.phone}
+          jobTitle={preScreenCandidate.jobTitle || 'Engineering Position'}
         />
       )}
     </div>

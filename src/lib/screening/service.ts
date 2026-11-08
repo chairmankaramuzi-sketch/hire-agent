@@ -33,7 +33,7 @@ export class ScreeningService {
       throw new Error(`No completed extraction run found for application ${applicationId}`);
     }
 
-    const criteriaList: CriterionEvaluationInput[] = application.job.criteria.map(c => ({
+    const criteriaList: CriterionEvaluationInput[] = application.job.criteria.map((c: any) => ({
       id: c.id,
       name: c.name,
       description: c.description,
@@ -42,7 +42,7 @@ export class ScreeningService {
       configuration: (c.configuration as Record<string, unknown>) ?? {},
     }));
 
-    const evidenceList: FactEvidenceInput[] = latestRun.evidence.map(e => ({
+    const evidenceList: FactEvidenceInput[] = latestRun.evidence.map((e: any) => ({
       fieldKey: e.fieldKey,
       normalizedValue: e.normalizedValue,
       evidenceText: e.evidenceText,
@@ -56,7 +56,7 @@ export class ScreeningService {
     const evaluation = evaluateScreening(criteriaVersion, criteriaList, evidenceList);
 
     // Save or update screening result for this criteria version
-    const screeningRecord = await prisma.$transaction(async tx => {
+    const screeningRecord = await prisma.$transaction(async (tx: any) => {
       const result = await tx.screeningResult.upsert({
         where: {
           applicationId_criteriaVersion: {

@@ -48,24 +48,37 @@ export async function POST(
     nextStatus = ApplicationStatus.READY_FOR_REVIEW; // HOLD stays in review
   }
 
-  const result = await prisma.$transaction(async tx => {
+  const result = await prisma.$transaction(async (tx: any) => {
     // Ensure decider user exists in DB
-    const existingDecider = await tx.appUser.findFirst({
-      where: {
-        OR: [
-          { id: session!.userId },
-          { email: { equals: session!.email, mode: 'insensitive' } },
-        ],
-      },
-    });
-    if (!existingDecider) {
-      await tx.appUser.create({
-        data: {
+    if (typeof tx.appUser?.findFirst === 'function') {
+      const existingDecider = await tx.appUser.findFirst({
+        where: {
+          OR: [
+            { id: session!.userId },
+            { email: { equals: session!.email, mode: 'insensitive' } },
+          ],
+        },
+      });
+      if (!existingDecider && typeof tx.appUser?.create === 'function') {
+        await tx.appUser.create({
+          data: {
+            id: session!.userId,
+            email: session!.email,
+            displayName: session!.displayName,
+            role: session!.role,
+          },
+        }).catch(() => null);
+      }
+    } else if (typeof tx.appUser?.upsert === 'function') {
+      await tx.appUser.upsert({
+        where: { id: session!.userId },
+        create: {
           id: session!.userId,
           email: session!.email,
           displayName: session!.displayName,
           role: session!.role,
         },
+        update: {},
       }).catch(() => null);
     }
 

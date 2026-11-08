@@ -28,6 +28,8 @@ import { ExecutiveXRayCard } from '@/components/candidate/ExecutiveXRayCard';
 import { SelfSchedulingModal } from '@/components/candidate/SelfSchedulingModal';
 import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPackModal';
 import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
+import { ExecutiveApprovalWorkflow } from '@/components/candidate/ExecutiveApprovalWorkflow';
+import { AiPreScreeningModal } from '@/components/candidate/AiPreScreeningModal';
 import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
 import { Mail, Printer, Sparkles, Calendar, Smartphone } from 'lucide-react';
@@ -69,6 +71,7 @@ export default function ApplicationDetailPage({
   const [schedulingModalOpen, setSchedulingModalOpen] = useState(false);
   const [boardPackModalOpen, setBoardPackModalOpen] = useState(false);
   const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
+  const [preScreenModalOpen, setPreScreenModalOpen] = useState(false);
   const [highlightedEvidence, setHighlightedEvidence] = useState<string | null>(null);
 
   const handleDownloadCv = async () => {
@@ -273,6 +276,17 @@ export default function ApplicationDetailPage({
         <div className="flex items-center gap-2 flex-wrap">
           {/* Blind Screening Toggle */}
           <BlindScreeningToggle />
+
+          {/* Option C: AI Pre-Screening Interview */}
+          <button
+            type="button"
+            onClick={() => setPreScreenModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/70 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-semibold shadow-sm transition-all"
+            title="View AI Asynchronous Pre-Screening interview answers & invite link"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+            <span>AI Pre-Screen</span>
+          </button>
 
           {/* Option 1: Self-Scheduling Interview Link */}
           <button
@@ -619,6 +633,15 @@ export default function ApplicationDetailPage({
 
         {/* Right Column (1 Col) - Review Decision & Original Document */}
         <div className="space-y-6">
+          {/* Option B: Multi-Stage Executive Approval Workflow */}
+          <ExecutiveApprovalWorkflow
+            applicationId={application.id}
+            candidateName={application.applicant.fullName}
+            jobTitle={job?.title ?? 'Engineering Role'}
+            score={run?.totalScore ?? 0}
+            currentUser={currentUser}
+          />
+
           {/* HR Decision Action Panel */}
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 space-y-4 transition-colors">
             <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -790,6 +813,19 @@ export default function ApplicationDetailPage({
         candidateName={application.applicant.fullName}
         candidatePhone={application.applicant.phone}
         jobTitle={job?.title ?? 'Engineering Role'}
+      />
+
+      {/* Option C: AI Pre-Screening Modal */}
+      <AiPreScreeningModal
+        isOpen={preScreenModalOpen}
+        onClose={() => setPreScreenModalOpen(false)}
+        applicationId={application.id}
+        candidateName={application.applicant.fullName}
+        candidateEmail={application.applicant.email}
+        candidatePhone={application.applicant.phone}
+        jobTitle={job?.title ?? 'Engineering Role'}
+        onSendInviteEmail={() => setEmailModalOpen(true)}
+        onSendInviteWhatsApp={() => setWhatsAppModalOpen(true)}
       />
     </div>
   );

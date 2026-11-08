@@ -604,10 +604,10 @@ export async function ingestCandidates(
     throw new Error(`Vacancy "${job.title}" has no active screening criteria. Add criteria before ingesting CVs.`);
   }
 
-  const criteriaVersion = Math.max(...job.criteria.map(c => c.version));
+  const criteriaVersion = Math.max(...job.criteria.map((c: any) => c.version));
   const activeCriteria: CriterionEvaluationInput[] = job.criteria
-    .filter(c => c.version === criteriaVersion)
-    .map(c => ({
+    .filter((c: any) => c.version === criteriaVersion)
+    .map((c: any) => ({
       id: c.id,
       name: c.name,
       description: c.description,
@@ -749,7 +749,7 @@ export async function ingestCandidates(
     where: { jobId: job.id, applicantEmail: { in: emails } },
     select: { id: true },
   });
-  const existingIds = existing.map(a => a.id);
+  const existingIds = existing.map((a: any) => a.id);
 
   await prisma.$transaction([
     prisma.hrDecision.deleteMany({ where: { applicationId: { in: existingIds } } }),

@@ -79,7 +79,7 @@ export class ExtractionService {
         documentBuffer: fileBuffer,
         mimeType: application.cvAsset.detectedMimeType,
         jobTitle: application.job.title,
-        criteriaSummary: application.job.criteria.map(c => ({
+        criteriaSummary: application.job.criteria.map((c: any) => ({
           name: c.name,
           description: c.description,
           kind: c.kind,
@@ -101,7 +101,7 @@ export class ExtractionService {
     const data = validation.data;
 
     // 5. Persist facts and transition application to READY_FOR_REVIEW
-    await prisma.$transaction(async tx => {
+    await prisma.$transaction(async (tx: any) => {
       // Save all extracted evidence items
       if (data.facts.length > 0) {
         await tx.extractedEvidence.createMany({
