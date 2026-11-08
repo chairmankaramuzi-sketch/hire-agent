@@ -8,6 +8,7 @@ import {
   CandidateProfile,
 } from '@/types';
 import { mockApplications, mockJobs } from './mockData';
+import { notificationsService } from './notifications';
 
 const defaultHeaders: Record<string, string> = {
   'Content-Type': 'application/json',
@@ -522,6 +523,33 @@ export const applicationsService = {
     target.reviewDecisions.unshift(decision);
     target.updatedAt = new Date().toISOString();
 
+    const candidateName = target?.applicant?.fullName || 'Candidate';
+    if (params.decision === 'SHORTLIST' || params.decision === 'ADVANCE') {
+      notificationsService.addNotification({
+        type: 'CANDIDATE_SHORTLISTED',
+        title: `Candidate Shortlisted: ${candidateName}`,
+        message: `HR (${params.reviewerName}) shortlisted candidate for interview. Reason: "${params.reason.trim()}"`,
+        actorName: params.reviewerName,
+        actorRole: 'HR',
+        targetId: params.applicationId,
+        targetUrl: `/applications/${params.applicationId}`,
+        priority: 'HIGH',
+        metadata: { candidateName, reason: params.reason },
+      });
+    } else {
+      notificationsService.addNotification({
+        type: params.decision === 'REJECT' ? 'CANDIDATE_REJECTED' : 'DECISION_HOLD',
+        title: `HR Decision: ${candidateName} (${params.decision})`,
+        message: `${params.reviewerName} marked candidate as ${params.decision}. Reason: "${params.reason.trim()}"`,
+        actorName: params.reviewerName,
+        actorRole: 'HR',
+        targetId: params.applicationId,
+        targetUrl: `/applications/${params.applicationId}`,
+        priority: 'NORMAL',
+        metadata: { candidateName, reason: params.reason },
+      });
+    }
+
     return JSON.parse(JSON.stringify(target));
   },
 
@@ -795,6 +823,20 @@ export const applicationsService = {
     }
 
     appsCache.clear();
+
+    if (created.length > 0) {
+      notificationsService.addNotification({
+        type: 'BATCH_CV_SCREENED',
+        title: `Batch CV Screening Completed (${created.length} Candidates)`,
+        message: `Batch CV Dropzone processed ${created.length} resumes. Skills extracted, criteria checked, and scores ranked.`,
+        actorName: 'AI Screening Engine',
+        actorRole: 'SYSTEM_AI',
+        targetUrl: '/applications',
+        priority: 'NORMAL',
+        metadata: { candidateCount: created.length },
+      });
+    }
+
     return { succeeded: created, failedCount: failed };
   },
 

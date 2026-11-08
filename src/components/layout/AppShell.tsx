@@ -19,6 +19,8 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { HireAgentLogo } from '@/components/brand/HireAgentLogo';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { ExecutiveLoginNotificationModal } from '@/components/notifications/ExecutiveLoginNotificationModal';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -33,6 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User>(activeUser);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginBriefingOpen, setLoginBriefingOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -231,6 +234,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         onClose={() => setCommandPaletteOpen(false)}
       />
 
+      {/* Executive Activity Alert Modal on Login for Admin and Recruiter */}
+      <ExecutiveLoginNotificationModal
+        currentUser={currentUser}
+        isOpen={loginBriefingOpen ? true : undefined}
+        onClose={() => setLoginBriefingOpen(false)}
+      />
+
       {/* Desktop Persistent Sidebar (visible on md: and larger) */}
       <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hidden md:flex flex-col shrink-0">
         {renderNavContent(false)}
@@ -306,6 +316,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
             {/* Blind Screening Toggle (Bias-Free DEI Mode) */}
             <BlindScreeningToggle />
+
+            {/* Notification Bell with Unread Badge & Recent Alerts */}
+            <NotificationBell
+              currentUser={currentUser}
+              onOpenBriefing={() => setLoginBriefingOpen(true)}
+            />
 
             {/* Theme Toggle Button (Light/Dark mode) */}
             <ThemeToggle />

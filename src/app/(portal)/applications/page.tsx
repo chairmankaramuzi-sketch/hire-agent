@@ -24,7 +24,7 @@ import {
   Smartphone,
   FileText,
 } from 'lucide-react';
-import { applicationsService } from '@/services';
+import { applicationsService, notificationsService } from '@/services';
 import { Application } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { CandidateComparisonModal } from '@/components/candidate/CandidateComparisonModal';
@@ -202,6 +202,18 @@ export default function AllApplicationsPage() {
             : app
         )
       );
+
+      if (idsToUpdate.length > 1) {
+        notificationsService.addNotification({
+          type: decision === 'SHORTLISTED' ? 'CANDIDATE_SHORTLISTED' : 'CANDIDATE_REJECTED',
+          title: `Mass Action: ${idsToUpdate.length} Candidates ${decision === 'SHORTLISTED' ? 'Shortlisted' : 'Rejected'}`,
+          message: `${idsToUpdate.length} candidates were updated in 1 click by the recruiter bar. Status synchronized across ATS pipeline.`,
+          actorName: 'Recruiter & HR Bar',
+          actorRole: 'HR',
+          targetUrl: decision === 'SHORTLISTED' ? '/applications?queue=ELIGIBLE' : '/applications?queue=INELIGIBLE',
+          priority: 'HIGH',
+        });
+      }
 
       setBulkFeedback(
         withEmailNotification

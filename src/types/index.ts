@@ -185,3 +185,5 @@ export interface DashboardMetrics {
   pendingReviews?: number;
   recommendedApplications?: number;
 }
+
+export * from './notification';

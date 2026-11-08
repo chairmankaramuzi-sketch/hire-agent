@@ -1,5 +1,6 @@
 import { Job, JobStatus, JobCriterion } from '@/types';
 import { mockJobs } from './mockData';
+import { notificationsService } from './notifications';
 
 const defaultHeaders: Record<string, string> = {
   'Content-Type': 'application/json',
@@ -242,6 +243,19 @@ export const jobsService = {
 
         clearJobsCache();
         jobsState.unshift(createdJob);
+
+        notificationsService.addNotification({
+          type: 'VACANCY_PUBLISHED',
+          title: `New Vacancy Published: ${createdJob.title}`,
+          message: `HR published '${createdJob.title}' in ${createdJob.department}. Now open for applicant screening.`,
+          actorName: 'HR Director',
+          actorRole: 'HR',
+          targetId: createdJob.id,
+          targetUrl: `/jobs/${createdJob.id}`,
+          priority: 'HIGH',
+          metadata: { jobTitle: createdJob.title, department: createdJob.department },
+        });
+
         return createdJob;
       }
     } catch {
@@ -277,6 +291,19 @@ export const jobsService = {
     };
 
     jobsState.unshift(newJob);
+
+    notificationsService.addNotification({
+      type: 'VACANCY_PUBLISHED',
+      title: `New Vacancy Published: ${newJob.title}`,
+      message: `HR published '${newJob.title}' in ${newJob.department}. Now open for applicant screening.`,
+      actorName: 'HR Director',
+      actorRole: 'HR',
+      targetId: newJob.id,
+      targetUrl: `/jobs/${newJob.id}`,
+      priority: 'HIGH',
+      metadata: { jobTitle: newJob.title, department: newJob.department },
+    });
+
     return JSON.parse(JSON.stringify(newJob));
   },
 
