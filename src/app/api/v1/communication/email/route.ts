@@ -7,7 +7,14 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { toEmail, toName, fromName, fromEmail, subject, body: emailBody, messageId, icsAttachment } = body;
+    const toEmail = body.toEmail || body.recipientEmail;
+    const toName = body.toName || body.recipientName || 'Candidate';
+    const fromName = body.fromName || 'Talent Acquisition';
+    const fromEmail = body.fromEmail || 'recruitment@company.com';
+    const subject = body.subject;
+    const emailBody = body.body || body.content || '';
+    const messageId = body.messageId || `msg_${Date.now()}`;
+    const icsAttachment = body.icsAttachment || body.calendarAttachment;
 
     if (!toEmail || !subject) {
       return apiError('VALIDATION_ERROR', 'Recipient email and subject are required', 400, requestId);
