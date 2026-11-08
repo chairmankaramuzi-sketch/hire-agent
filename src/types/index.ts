@@ -189,3 +189,4 @@ export interface DashboardMetrics {
 export * from './notification';
 export * from './approval';
 export * from './preScreening';
+export * from './offer';

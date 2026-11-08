@@ -14,10 +14,12 @@ import {
   ChevronRight,
   Stamp,
   Lock,
+  FileText,
 } from 'lucide-react';
 import { approvalService } from '@/services/approvalService';
 import { CandidateApprovalState, ApprovalStage } from '@/types/approval';
 import { User } from '@/types';
+import { OfferLetterModal } from './OfferLetterModal';
 
 interface ExecutiveApprovalWorkflowProps {
   applicationId: string;
@@ -40,6 +42,7 @@ export function ExecutiveApprovalWorkflow({
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [offerModalOpen, setOfferModalOpen] = useState(false);
 
   useEffect(() => {
     setApprovalState(approvalService.getApprovalState(applicationId));
@@ -313,6 +316,39 @@ export function ExecutiveApprovalWorkflow({
         </div>
       )}
 
+      {/* Instant Contract Generation: Appears when Mr. Kalamuzi grants Final Hiring Authorization */}
+      {currentStage === 'EXECUTIVE_AUTHORIZED' && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/60 border-2 border-emerald-400 dark:border-emerald-600 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in zoom-in-95 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
+              <Stamp className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                  Final Hiring Authorization Granted!
+                </span>
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-100">
+                  Contract Ready
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800/90 dark:text-emerald-300/90 mt-0.5">
+                Mr. Kalamuzi has granted final sign-off. Assemble the package and dispatch the official digital appointment contract.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setOfferModalOpen(true)}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all shrink-0 hover:scale-105"
+          >
+            <FileText className="w-4 h-4" />
+            <span>Generate Official Offer Letter</span>
+          </button>
+        </div>
+      )}
+
       {/* Action Workbench conditioned on role */}
       <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -380,6 +416,16 @@ export function ExecutiveApprovalWorkflow({
           </button>
         </div>
       </div>
+
+      {/* Offer Letter & Digital Contract Generator Modal */}
+      <OfferLetterModal
+        isOpen={offerModalOpen}
+        onClose={() => setOfferModalOpen(false)}
+        applicationId={applicationId}
+        candidateName={candidateName}
+        jobTitle={jobTitle}
+        currentUser={currentUser}
+      />
     </div>
   );
 }

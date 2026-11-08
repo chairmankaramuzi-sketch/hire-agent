@@ -30,6 +30,7 @@ import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPa
 import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
 import { ExecutiveApprovalWorkflow } from '@/components/candidate/ExecutiveApprovalWorkflow';
 import { AiPreScreeningModal } from '@/components/candidate/AiPreScreeningModal';
+import { OfferLetterModal } from '@/components/candidate/OfferLetterModal';
 import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
 import { Mail, Printer, Sparkles, Calendar, Smartphone } from 'lucide-react';
@@ -72,6 +73,7 @@ export default function ApplicationDetailPage({
   const [boardPackModalOpen, setBoardPackModalOpen] = useState(false);
   const [whatsAppModalOpen, setWhatsAppModalOpen] = useState(false);
   const [preScreenModalOpen, setPreScreenModalOpen] = useState(false);
+  const [offerModalOpen, setOfferModalOpen] = useState(false);
   const [highlightedEvidence, setHighlightedEvidence] = useState<string | null>(null);
 
   const handleDownloadCv = async () => {
@@ -286,6 +288,17 @@ export default function ApplicationDetailPage({
           >
             <Sparkles className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
             <span>AI Pre-Screen</span>
+          </button>
+
+          {/* Feature: 1-Click Offer Letter & e-Signature */}
+          <button
+            type="button"
+            onClick={() => setOfferModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/70 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold shadow-sm transition-all"
+            title="Assemble Official Offer Letter & Digital Signing Link"
+          >
+            <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>Offer Letter</span>
           </button>
 
           {/* Option 1: Self-Scheduling Interview Link */}
@@ -826,6 +839,17 @@ export default function ApplicationDetailPage({
         jobTitle={job?.title ?? 'Engineering Role'}
         onSendInviteEmail={() => setEmailModalOpen(true)}
         onSendInviteWhatsApp={() => setWhatsAppModalOpen(true)}
+      />
+
+      {/* Feature: Executive Offer Letter & e-Signature Modal */}
+      <OfferLetterModal
+        isOpen={offerModalOpen}
+        onClose={() => setOfferModalOpen(false)}
+        applicationId={application.id}
+        candidateName={application.applicant.fullName}
+        candidateEmail={application.applicant.email}
+        jobTitle={job?.title ?? 'Engineering Role'}
+        currentUser={currentUser}
       />
     </div>
   );

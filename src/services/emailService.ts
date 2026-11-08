@@ -88,6 +88,10 @@ export const emailService = {
     };
   },
 
+  async sendEmail(payload: SendEmailPayload): Promise<EmailDeliveryResult> {
+    return this.sendInterviewEmail(payload);
+  },
+
   /**
    * Returns recent dispatched email logs
    */

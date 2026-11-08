@@ -15,6 +15,7 @@ import {
   ArrowRight,
   MoreVertical,
   Plus,
+  Stamp,
 } from 'lucide-react';
 import { Application } from '@/types';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
@@ -26,6 +27,7 @@ interface KanbanPipelineBoardProps {
   onOpenWhatsApp?: (application: Application) => void;
   onOpenBoardPack?: (application: Application) => void;
   onOpenPreScreen?: (application: Application) => void;
+  onOpenOffer?: (application: Application) => void;
 }
 
 interface ColumnDef {
@@ -42,6 +44,7 @@ export function KanbanPipelineBoard({
   onOpenWhatsApp,
   onOpenBoardPack,
   onOpenPreScreen,
+  onOpenOffer,
 }: KanbanPipelineBoardProps) {
   const { maskName } = useBlindScreening();
 
@@ -242,6 +245,17 @@ export function KanbanPipelineBoard({
                                 title="Executive Board Pack Dossier"
                               >
                                 <FileText className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
+                            {onOpenOffer && (
+                              <button
+                                type="button"
+                                onClick={() => onOpenOffer(app)}
+                                className="p-1 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+                                title="Official Appointment Offer Letter & e-Signature"
+                              >
+                                <Stamp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                               </button>
                             )}
 

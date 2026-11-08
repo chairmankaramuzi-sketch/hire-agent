@@ -5,7 +5,10 @@ export type NotificationType =
   | 'CANDIDATE_REJECTED'
   | 'DECISION_HOLD'
   | 'CRITERIA_UPDATED'
-  | 'ANOMALY_FLAGGED';
+  | 'ANOMALY_FLAGGED'
+  | 'PRESCREEN_COMPLETED'
+  | 'OFFER_GENERATED'
+  | 'OFFER_SIGNED';
 
 export interface SystemNotification {
   id: string;

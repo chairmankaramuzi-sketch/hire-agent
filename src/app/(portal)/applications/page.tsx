@@ -23,6 +23,7 @@ import {
   Calendar,
   Smartphone,
   FileText,
+  Stamp,
 } from 'lucide-react';
 import { applicationsService, notificationsService } from '@/services';
 import { Application } from '@/types';
@@ -37,10 +38,12 @@ import { SelfSchedulingModal } from '@/components/candidate/SelfSchedulingModal'
 import { ExecutiveBoardPackModal } from '@/components/candidate/ExecutiveBoardPackModal';
 import { WhatsAppSmsOutreachModal } from '@/components/candidate/WhatsAppSmsOutreachModal';
 import { AiPreScreeningModal } from '@/components/candidate/AiPreScreeningModal';
+import { OfferLetterModal } from '@/components/candidate/OfferLetterModal';
 import { KanbanPipelineBoard } from '@/components/candidate/KanbanPipelineBoard';
 import { BlindScreeningToggle } from '@/components/candidate/BlindScreeningToggle';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
 import { approvalService } from '@/services/approvalService';
+import { activeUser } from '@/services/auth';
 
 export default function AllApplicationsPage() {
   const { isBlindMode, maskName, maskEmail } = useBlindScreening();
@@ -75,6 +78,7 @@ export default function AllApplicationsPage() {
   const [boardPackCandidate, setBoardPackCandidate] = useState<Application | null>(null);
   const [whatsAppCandidate, setWhatsAppCandidate] = useState<Application | null>(null);
   const [preScreenCandidate, setPreScreenCandidate] = useState<Application | null>(null);
+  const [offerCandidate, setOfferCandidate] = useState<Application | null>(null);
 
   useEffect(() => {
     async function fetchApps() {
@@ -499,6 +503,7 @@ export default function AllApplicationsPage() {
           onOpenWhatsApp={(app) => setWhatsAppCandidate(app)}
           onOpenBoardPack={(app) => setBoardPackCandidate(app)}
           onOpenPreScreen={(app) => setPreScreenCandidate(app)}
+          onOpenOffer={(app) => setOfferCandidate(app)}
           onStageChange={(id, colId) => {
             setBulkFeedback(`Candidate stage updated to ${colId}!`);
           }}
@@ -692,6 +697,16 @@ export default function AllApplicationsPage() {
                               <FileText className="w-3.5 h-3.5" />
                             </button>
 
+                            {/* Feature: Offer Letter & e-Signature button */}
+                            <button
+                              type="button"
+                              onClick={() => setOfferCandidate(app)}
+                              className="p-1.5 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                              title="Official Appointment Offer Letter & e-Signature"
+                            >
+                              <Stamp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            </button>
+
                             {/* View Detail Link */}
                             <Link
                               href={`/applications/${app.id}`}
@@ -768,6 +783,19 @@ export default function AllApplicationsPage() {
           candidateEmail={preScreenCandidate.applicant.email}
           candidatePhone={preScreenCandidate.applicant.phone}
           jobTitle={preScreenCandidate.jobTitle || 'Engineering Position'}
+        />
+      )}
+
+      {/* Feature: Executive Offer Letter & e-Signature Modal */}
+      {offerCandidate && (
+        <OfferLetterModal
+          isOpen={!!offerCandidate}
+          onClose={() => setOfferCandidate(null)}
+          applicationId={offerCandidate.id}
+          candidateName={offerCandidate.applicant.fullName}
+          candidateEmail={offerCandidate.applicant.email}
+          jobTitle={offerCandidate.jobTitle || 'Engineering Position'}
+          currentUser={activeUser}
         />
       )}
     </div>
