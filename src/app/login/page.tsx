@@ -31,23 +31,23 @@ interface AccountOption {
 const ACCOUNTS: AccountOption[] = [
   {
     key: 'kalamuzi',
-    name: 'MR. KALAMUZI',
-    role: 'Admin',
-    loginInput: 'MR. KALAMUZI',
-    pass: 'Admin@2026',
+    name: 'ADMIN',
+    role: 'Executive Admin',
+    loginInput: 'kalamuzi.hire@admin.com',
+    pass: 'chairman175',
   },
   {
     key: 'nahurira',
-    name: 'MR. NAHURIRA',
+    name: 'HR. DIRECTOR',
     role: 'HR Director',
-    loginInput: 'MR. NAHURIRA',
-    pass: 'HrDirector@2026',
+    loginInput: 'nahurira.hire@hrdirector.com',
+    pass: 'nahurira009',
   },
   {
     key: 'rose',
-    name: 'MRS. ROSE',
+    name: 'RECRUITER',
     role: 'Recruiter',
-    loginInput: 'MRS. ROSE',
+    loginInput: 'rose.hire@recruiter.com',
     pass: 'Recruiter@2026',
   },
 ];
@@ -82,11 +82,11 @@ export default function LoginPage() {
   const handleInputChange = (val: string) => {
     setUsername(val);
     const cleaned = val.trim().toLowerCase();
-    if (cleaned.includes('kalamuzi') || cleaned.includes('karamuzi') || cleaned === 'admin') {
+    if (cleaned.includes('kalamuzi') || cleaned.includes('karamuzi') || cleaned.includes('admin')) {
       setSelectedRole('kalamuzi');
-    } else if (cleaned.includes('nahurira') || cleaned.includes('nahirira') || cleaned === 'hr') {
+    } else if (cleaned.includes('nahurira') || cleaned.includes('nahirira') || cleaned.includes('hrdirector') || cleaned.includes('director') || cleaned === 'hr') {
       setSelectedRole('nahurira');
-    } else if (cleaned.includes('rose') || cleaned === 'recruiter') {
+    } else if (cleaned.includes('rose') || cleaned.includes('recruiter')) {
       setSelectedRole('rose');
     } else {
       setSelectedRole('custom');
@@ -366,28 +366,37 @@ export default function LoginPage() {
             <div className="space-y-2 text-xs">
               <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                 <span className="font-bold text-slate-900 dark:text-white block">
-                  MR. KALAMUZI (Admin)
+                  ADMIN
+                </span>
+                <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px] block">
+                  User: kalamuzi.hire@admin.com
                 </span>
                 <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] block">
-                  Password: Admin@2026
+                  Password: chairman175
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                 <span className="font-bold text-slate-900 dark:text-white block">
-                  MR. NAHURIRA (HR Director)
+                  HR. DIRECTOR
+                </span>
+                <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px] block">
+                  User: nahurira.hire@hrdirector.com
                 </span>
                 <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] block">
-                  Password: HrDirector@2026
+                  Password: nahurira009
                 </span>
               </div>
 
               <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                 <span className="font-bold text-slate-900 dark:text-white block">
-                  MRS. ROSE (Recruiter)
+                  RECRUITER
+                </span>
+                <span className="text-slate-600 dark:text-slate-300 font-mono text-[11px] block">
+                  User: rose.hire@recruiter.com
                 </span>
                 <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px] block">
-                  Password: Recruiter@2026
+                  Password: Recruiter@2026 (or rose009)
                 </span>
               </div>
             </div>

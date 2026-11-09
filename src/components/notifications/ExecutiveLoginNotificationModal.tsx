@@ -65,7 +65,10 @@ export function ExecutiveLoginNotificationModal({
         currentUser.role === 'HR' ||
         currentUser.name?.toLowerCase().includes('kalamuzi') ||
         currentUser.name?.toLowerCase().includes('nahurira') ||
-        currentUser.name?.toLowerCase().includes('rose');
+        currentUser.name?.toLowerCase().includes('rose') ||
+        currentUser.name?.toLowerCase().includes('admin') ||
+        currentUser.name?.toLowerCase().includes('recruiter') ||
+        currentUser.name?.toLowerCase().includes('director');
 
       if (isStaff) {
         const hasPending = notificationsService.hasPendingLoginAlerts(currentUser.id);

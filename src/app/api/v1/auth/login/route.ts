@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
 
   // Detect role aliases
   const isAdminAlias = [
+    'kalamuzi.hire@admin.com',
     'mr. kalamuzi',
     'mr kalamuzi',
     'kalamuzi',
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
   ].includes(rawUsername);
 
   const isHrAlias = [
+    'nahurira.hire@hrdirector.com',
     'mr. nahurira',
     'mr nahurira',
     'nahurira',
@@ -56,11 +58,13 @@ export async function POST(request: NextRequest) {
     'jane doe',
     'jane.doe',
     'hr',
+    'hr. director',
     'hr director',
     'hr@company.com',
   ].includes(rawUsername);
 
   const isRecruiterAlias = [
+    'rose.hire@recruiter.com',
     'mrs. rose',
     'mrs rose',
     'rose',
@@ -80,37 +84,33 @@ export async function POST(request: NextRequest) {
 
   if (isAdminAlias) {
     orConditions.push(
+      { email: { equals: 'kalamuzi.hire@admin.com', mode: 'insensitive' } },
       { email: { equals: 'kalamuzi@company.com', mode: 'insensitive' } },
-      { email: { equals: 'karamuzi@company.com', mode: 'insensitive' } },
       { email: { equals: 'admin@company.com', mode: 'insensitive' } },
-      { username: { equals: 'kalamuzi', mode: 'insensitive' } },
-      { username: { equals: 'karamuzi', mode: 'insensitive' } },
+      { username: { equals: 'kalamuzi.hire@admin.com', mode: 'insensitive' } },
       { username: { equals: 'admin', mode: 'insensitive' } },
-      { displayName: { contains: 'Kalamuzi', mode: 'insensitive' } },
-      { displayName: { contains: 'Karamuzi', mode: 'insensitive' } }
+      { displayName: { equals: 'ADMIN', mode: 'insensitive' } }
     );
   }
 
   if (isHrAlias) {
     orConditions.push(
+      { email: { equals: 'nahurira.hire@hrdirector.com', mode: 'insensitive' } },
       { email: { equals: 'nahurira@company.com', mode: 'insensitive' } },
       { email: { equals: 'hr@company.com', mode: 'insensitive' } },
+      { username: { equals: 'nahurira.hire@hrdirector.com', mode: 'insensitive' } },
       { username: { equals: 'nahurira', mode: 'insensitive' } },
-      { username: { equals: 'jane.doe', mode: 'insensitive' } },
-      { displayName: { contains: 'Nahurira', mode: 'insensitive' } },
-      { displayName: { contains: 'Nahirira', mode: 'insensitive' } },
-      { username: { equals: 'nahirira', mode: 'insensitive' } },
-      { email: { equals: 'nahirira@company.com', mode: 'insensitive' } }
+      { displayName: { equals: 'HR. DIRECTOR', mode: 'insensitive' } }
     );
   }
 
   if (isRecruiterAlias) {
     orConditions.push(
+      { email: { equals: 'rose.hire@recruiter.com', mode: 'insensitive' } },
       { email: { equals: 'rose@company.com', mode: 'insensitive' } },
-      { email: { equals: 'marcus.sterling@company.com', mode: 'insensitive' } },
-      { username: { equals: 'rose', mode: 'insensitive' } },
-      { username: { equals: 'marcus.sterling', mode: 'insensitive' } },
-      { displayName: { contains: 'Rose', mode: 'insensitive' } }
+      { username: { equals: 'rose.hire@recruiter.com', mode: 'insensitive' } },
+      { username: { equals: 'recruiter', mode: 'insensitive' } },
+      { displayName: { equals: 'RECRUITER', mode: 'insensitive' } }
     );
   }
 
@@ -132,14 +132,16 @@ export async function POST(request: NextRequest) {
       const sEmail = s.email.toLowerCase();
       const sName = s.displayName.toLowerCase();
       if (isAdminAlias && s.role === 'ADMIN') return true;
-      if (isHrAlias && s.id === 'usr-hr-001') return true;
-      if (isRecruiterAlias && s.id === 'usr-hr-002') return true;
+      if (isHrAlias && (s.id === 'usr-hr-001' || s.displayName.includes('DIRECTOR'))) return true;
+      if (isRecruiterAlias && (s.id === 'usr-hr-002' || s.displayName.includes('RECRUITER'))) return true;
       return sUser === rawUsername || sEmail === rawUsername || sName === rawUsername;
     });
 
     if (fallbackStaff) {
       const validPasswords = [
         fallbackStaff.password,
+        'chairman175',
+        'nahurira009',
         'Admin@2026',
         'Kalamuzi@2026',
         'Karamuzi@2026',
@@ -149,8 +151,12 @@ export async function POST(request: NextRequest) {
         'Nahirira@2026',
         'Recruiter@2026',
         'Rose@2026',
+        'rose009',
       ];
-      if (validPasswords.includes(password) || validPasswords.some((vp) => vp.toLowerCase() === password.trim().toLowerCase())) {
+      if (
+        validPasswords.includes(password) ||
+        validPasswords.some((vp) => vp.toLowerCase() === password.trim().toLowerCase())
+      ) {
         passwordOk = true;
         matchedUser = {
           id: fallbackStaff.id,
@@ -170,7 +176,7 @@ export async function POST(request: NextRequest) {
   if (!matchedUser || !passwordOk) {
     return apiError(
       'INVALID_CREDENTIALS',
-      'Invalid username or password. For Admin, input "MR. KALAMUZI" with password "Admin@2026".',
+      'Invalid username or password. For Admin, input "kalamuzi.hire@admin.com" with password "chairman175".',
       401,
       requestId
     );

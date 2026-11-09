@@ -59,13 +59,13 @@ export function ExecutiveApprovalWorkflow({
     try {
       const res = approvalService.submitForDirectorApproval(
         applicationId,
-        currentUser.name || 'MRS. ROSE',
+        currentUser.name || 'RECRUITER',
         candidateName,
         comments || `Verified ${score}% criteria match. Candidate qualified for Director review.`
       );
       setApprovalState(res);
       setComments('');
-      setFeedback('✅ Candidate proposed to HR Director (MR. NAHURIRA).');
+      setFeedback('✅ Candidate proposed to HR Director (HR. DIRECTOR).');
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setFeedback(null), 4000);
@@ -77,13 +77,13 @@ export function ExecutiveApprovalWorkflow({
     try {
       const res = approvalService.directorApprove(
         applicationId,
-        currentUser.name || 'MR. NAHURIRA',
+        currentUser.name || 'HR. DIRECTOR',
         candidateName,
         comments || `Director review complete. Match confirmed at ${score}%. Advanced to Executive review.`
       );
       setApprovalState(res);
       setComments('');
-      setFeedback('✅ HR Director approved. Advanced to Executive Sign-off (MR. KALAMUZI).');
+      setFeedback('✅ HR Director approved. Advanced to Executive Sign-off (ADMIN).');
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setFeedback(null), 4000);
@@ -95,13 +95,13 @@ export function ExecutiveApprovalWorkflow({
     try {
       const res = approvalService.executiveAuthorize(
         applicationId,
-        currentUser.name || 'MR. KALAMUZI',
+        currentUser.name || 'ADMIN',
         candidateName,
         comments || 'Executive authorization signed. Board Pack reviewed and offer letter approved.'
       );
       setApprovalState(res);
       setComments('');
-      setFeedback('🏆 Final Executive Authorization granted by MR. KALAMUZI! Offer approved.');
+      setFeedback('🏆 Final Executive Authorization granted by ADMIN! Offer approved.');
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setFeedback(null), 5000);
@@ -117,7 +117,7 @@ export function ExecutiveApprovalWorkflow({
     try {
       const res = approvalService.requestRevisions(
         applicationId,
-        currentUser.name || 'MR. NAHURIRA',
+        currentUser.name || 'HR. DIRECTOR',
         candidateName,
         comments
       );
@@ -216,9 +216,9 @@ export function ExecutiveApprovalWorkflow({
               <span className="text-[11px] font-medium text-slate-400">Pending Review</span>
             )}
           </div>
-          <h4 className="text-xs font-bold text-slate-900 dark:text-white">MRS. ROSE</h4>
+          <h4 className="text-xs font-bold text-slate-900 dark:text-white">RECRUITER</h4>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            Senior Technical Recruiter
+            Technical Recruiter
           </p>
           <div className="mt-3 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
             {approvalState.history.find((h) => h.stage === 'RECRUITER_PROPOSED') ? (
@@ -251,7 +251,7 @@ export function ExecutiveApprovalWorkflow({
               <span className="text-[11px] font-medium text-slate-400">Awaiting Director</span>
             )}
           </div>
-          <h4 className="text-xs font-bold text-slate-900 dark:text-white">MR. NAHURIRA</h4>
+          <h4 className="text-xs font-bold text-slate-900 dark:text-white">HR. DIRECTOR</h4>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Head of Talent & HR Director
           </p>
@@ -286,7 +286,7 @@ export function ExecutiveApprovalWorkflow({
               <span className="text-[11px] font-medium text-slate-400">Final Sign-off</span>
             )}
           </div>
-          <h4 className="text-xs font-bold text-slate-900 dark:text-white">MR. KALAMUZI</h4>
+          <h4 className="text-xs font-bold text-slate-900 dark:text-white">ADMIN</h4>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Executive Administrator & Director
           </p>
@@ -333,7 +333,7 @@ export function ExecutiveApprovalWorkflow({
                 </span>
               </div>
               <p className="text-xs text-emerald-800/90 dark:text-emerald-300/90 mt-0.5">
-                Mr. Kalamuzi has granted final sign-off. Assemble the package and dispatch the official digital appointment contract.
+                The Executive Administrator (ADMIN) has granted final sign-off. Assemble the package and dispatch the official digital appointment contract.
               </p>
             </div>
           </div>
@@ -381,7 +381,7 @@ export function ExecutiveApprovalWorkflow({
             className="px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition-all flex items-center gap-1.5 border border-indigo-200 dark:border-indigo-800"
           >
             <Send className="w-3.5 h-3.5" />
-            <span>1. Propose to HR Director (Mrs. Rose)</span>
+            <span>1. Propose to HR Director (RECRUITER)</span>
           </button>
 
           {/* Director Nahurira Action */}
@@ -392,7 +392,7 @@ export function ExecutiveApprovalWorkflow({
             className="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold transition-all flex items-center gap-1.5 border border-blue-200 dark:border-blue-800"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>2. Director Interview Approval (Mr. Nahurira)</span>
+            <span>2. Director Interview Approval (HR. DIRECTOR)</span>
           </button>
 
           {/* Executive Kalamuzi Action */}
@@ -403,7 +403,7 @@ export function ExecutiveApprovalWorkflow({
             className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5 ml-auto"
           >
             <Award className="w-3.5 h-3.5" />
-            <span>3. Executive Final Offer Sign-off (Mr. Kalamuzi)</span>
+            <span>3. Executive Final Offer Sign-off (ADMIN)</span>
           </button>
 
           <button
