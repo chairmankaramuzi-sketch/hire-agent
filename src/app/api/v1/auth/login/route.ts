@@ -186,11 +186,20 @@ export async function POST(request: NextRequest) {
     return apiError('FORBIDDEN', 'Applicant accounts do not have access to the HR portal.', 403, requestId);
   }
 
+  let effectiveDisplayName = matchedUser.displayName;
+  if (isAdminAlias || matchedUser.id === 'usr-admin-001') {
+    effectiveDisplayName = 'ADMIN';
+  } else if (isHrAlias || matchedUser.id === 'usr-hr-001') {
+    effectiveDisplayName = 'HR. DIRECTOR';
+  } else if (isRecruiterAlias || matchedUser.id === 'usr-hr-002') {
+    effectiveDisplayName = 'RECRUITER';
+  }
+
   const session: AuthSession = {
     userId: matchedUser.id,
     email: matchedUser.email,
     role: matchedUser.role,
-    displayName: matchedUser.displayName,
+    displayName: effectiveDisplayName,
   };
 
   const token = serializeSession(session);
@@ -201,8 +210,8 @@ export async function POST(request: NextRequest) {
       user: {
         id: matchedUser.id,
         email: matchedUser.email,
-        name: matchedUser.displayName,
-        displayName: matchedUser.displayName,
+        name: effectiveDisplayName,
+        displayName: effectiveDisplayName,
         role: matchedUser.role,
       },
       token,
