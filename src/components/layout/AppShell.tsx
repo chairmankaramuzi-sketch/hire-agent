@@ -12,6 +12,9 @@ import {
   Search,
   Menu,
   X,
+  Smartphone,
+  Scale,
+  Play,
 } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 import { User } from '@/types';
@@ -21,6 +24,9 @@ import { HireAgentLogo } from '@/components/brand/HireAgentLogo';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { ExecutiveLoginNotificationModal } from '@/components/notifications/ExecutiveLoginNotificationModal';
+import { AudiencePhoneTestModal } from '@/components/presentation/AudiencePhoneTestModal';
+import { AiFairnessAuditModal } from '@/components/presentation/AiFairnessAuditModal';
+import { PresentationTourBanner } from '@/components/presentation/PresentationTourBanner';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,6 +42,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginBriefingOpen, setLoginBriefingOpen] = useState(false);
+  const [phoneTestOpen, setPhoneTestOpen] = useState(false);
+  const [phoneTestTab, setPhoneTestTab] = useState<'prescreen' | 'offer'>('prescreen');
+  const [fairnessAuditOpen, setFairnessAuditOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -314,6 +323,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </kbd>
             </button>
 
+            {/* Live Presentation Phone Test Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setPhoneTestTab('prescreen');
+                setPhoneTestOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/10 via-emerald-600/15 to-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-700/80 text-xs font-bold text-emerald-800 dark:text-emerald-300 transition-all shadow-xs cursor-pointer"
+              title="Open Live Audience Smartphone QR Code"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden sm:inline">Test on Phone</span>
+            </button>
+
+            {/* AI Fairness & Anti-Bias Audit Certificate Button */}
+            <button
+              type="button"
+              onClick={() => setFairnessAuditOpen(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-300 transition-all shadow-xs cursor-pointer"
+              title="Open AI Bias & Algorithmic Fairness Inspector"
+            >
+              <Scale className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span className="hidden md:inline">Fairness Audit</span>
+            </button>
+
             {/* Blind Screening Toggle (Bias-Free DEI Mode) */}
             <BlindScreeningToggle />
 
@@ -340,6 +374,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Responsive Main Page Container */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">{children}</main>
       </div>
+
+      {/* 1-Click Presentation Tour Banner (Demo Story Mode) */}
+      <PresentationTourBanner
+        onOpenPhoneTest={(tab) => {
+          setPhoneTestTab(tab || 'prescreen');
+          setPhoneTestOpen(true);
+        }}
+        onOpenFairnessAudit={() => setFairnessAuditOpen(true)}
+      />
+
+      {/* Audience Live Smartphone Test Modal */}
+      <AudiencePhoneTestModal
+        isOpen={phoneTestOpen}
+        onClose={() => setPhoneTestOpen(false)}
+        defaultTab={phoneTestTab}
+      />
+
+      {/* AI Fairness & Compliance Audit Modal */}
+      <AiFairnessAuditModal
+        isOpen={fairnessAuditOpen}
+        onClose={() => setFairnessAuditOpen(false)}
+      />
     </div>
   );
 }

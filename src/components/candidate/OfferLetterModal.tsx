@@ -20,10 +20,13 @@ import {
   Briefcase,
   AlertCircle,
   ExternalLink,
+  QrCode,
+  Smartphone,
 } from 'lucide-react';
 import { offerService } from '@/services/offerService';
 import { OfferPackage } from '@/types/offer';
 import { User } from '@/types';
+import { AudiencePhoneTestModal } from '@/components/presentation/AudiencePhoneTestModal';
 
 interface OfferLetterModalProps {
   isOpen: boolean;
@@ -65,6 +68,7 @@ export function OfferLetterModal({
   const [isIssuing, setIsIssuing] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [showPhoneQr, setShowPhoneQr] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -340,6 +344,15 @@ export function OfferLetterModal({
                 <span>Preview Candidate Signing Screen</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
+
+              <button
+                type="button"
+                onClick={() => setShowPhoneQr(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 text-xs font-bold transition-all shadow-xs cursor-pointer mt-1"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+                <span>📱 Scan to Sign on Phone</span>
+              </button>
             </div>
           </div>
 
@@ -478,6 +491,13 @@ export function OfferLetterModal({
           </div>
         </div>
       </div>
+
+      {/* Live Phone Signing QR Code Modal */}
+      <AudiencePhoneTestModal
+        isOpen={showPhoneQr}
+        onClose={() => setShowPhoneQr(false)}
+        defaultTab="offer"
+      />
     </div>
   );
 }

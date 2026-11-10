@@ -38,6 +38,7 @@ import { DashboardMetrics, Job, Application, User } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
 import { VisualAnalytics } from '@/components/dashboard/VisualAnalytics';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
+import { RoiCalculatorWidget } from '@/components/presentation/RoiCalculatorWidget';
 
 export default function DashboardPage() {
   const [currentUser, setCurrentUser] = useState<User>(activeUser);
@@ -460,6 +461,9 @@ export default function DashboardPage() {
 
       {/* Live Activity & Team Audit Feed */}
       <ActivityFeed applications={allApplications} />
+
+      {/* Executive ROI & Financial Impact Calculator (Presentation Feature) */}
+      <RoiCalculatorWidget />
 
       {/* =========================================================================
           HYBRID VIEW SWITCHER & FILTER CONTROLS BAR (Concept 4 Feature)
