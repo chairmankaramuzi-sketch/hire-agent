@@ -45,6 +45,30 @@ export function middleware(request: NextRequest) {
     'max-age=31536000; includeSubDomains; preload'
   );
 
+  // Rate limiting for login authentication to prevent brute force
+  if (request.method === 'POST' && request.nextUrl.pathname === '/api/v1/auth/login') {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+      request.headers.get('x-real-ip') ??
+      '127.0.0.1';
+
+    const { allowed, remaining } = checkRateLimit(`login_${ip}`, 15, 60 * 1000);
+    response.headers.set('X-RateLimit-Remaining', remaining.toString());
+
+    if (!allowed) {
+      return NextResponse.json(
+        {
+          error: {
+            code: 'RATE_LIMIT_EXCEEDED',
+            message: 'Too many login attempts. Please wait 60 seconds before trying again.',
+            requestId: crypto.randomUUID ? crypto.randomUUID() : 'rate_limited',
+          },
+        },
+        { status: 429, headers: response.headers }
+      );
+    }
+  }
+
   // Rate limiting for public submission endpoints
   if (
     request.method === 'POST' &&

@@ -21,6 +21,7 @@ export function serializeSession(session: AuthSession): string {
 
 export function parseSessionToken(token: string): AuthSession | null {
   try {
+    if (!token || typeof token !== 'string') return null;
     const parts = token.split('.');
     if (parts.length === 2) {
       const [signature, payload] = parts;
@@ -41,27 +42,17 @@ export function parseSessionToken(token: string): AuthSession | null {
       }
       return null;
     }
-
-    // Support legacy unsigned token during transition
-    const decoded = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
-    if (decoded.userId && decoded.role && Object.values(UserRole).includes(decoded.role as UserRole)) {
-      return {
-        userId: decoded.userId,
-        email: decoded.email ?? 'unknown@example.com',
-        role: decoded.role as UserRole,
-        displayName: decoded.displayName ?? 'User',
-      };
-    }
+    // Cryptographically unsigned tokens rejected
+    return null;
   } catch {
     return null;
   }
-  return null;
 }
 
 /**
  * Extract authenticated user session from request.
- * Reads verified session cookie or headers set by reverse proxy or authentication middleware.
- * NEVER trusts client-supplied query params or body parameters for role.
+ * Reads verified session cookie or Authorization header.
+ * NEVER trusts unverified client query params.
  */
 export async function getSession(request: NextRequest): Promise<AuthSession | null> {
   // 1. Try reading verified cookie first
@@ -72,10 +63,22 @@ export async function getSession(request: NextRequest): Promise<AuthSession | nu
       if (session) return session;
     }
   } catch {
-    // Cookie malformed or unavailable, continue to headers
+    // Cookie malformed or unavailable, continue
   }
 
-  // 2. Fall back to headers
+  // 2. Try Authorization: Bearer <token>
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.slice(7).trim();
+      const session = parseSessionToken(token);
+      if (session) return session;
+    }
+  } catch {
+    // Header malformed, continue
+  }
+
+  // 3. Fall back to internal/test mock headers
   const userId = request.headers.get('x-user-id');
   const roleHeader = request.headers.get('x-user-role');
   const email = request.headers.get('x-user-email');
