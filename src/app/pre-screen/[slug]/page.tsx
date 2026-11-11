@@ -20,6 +20,7 @@ import {
   AlertCircle,
   HelpCircle,
   Volume2,
+  ArrowLeft,
 } from 'lucide-react';
 import { preScreeningService, DEFAULT_QUESTIONS } from '@/services/preScreeningService';
 
@@ -160,7 +161,15 @@ export default function CandidatePreScreenPage({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group"
+            title="Return to Dashboard"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hidden sm:flex items-center gap-1">
             <ShieldCheck className="w-3.5 h-3.5" /> Verified Candidate Session
           </span>
         </div>
@@ -200,6 +209,16 @@ export default function CandidatePreScreenPage({
                 <span>Next Step:</span>
                 <span className="font-semibold text-indigo-600 dark:text-indigo-400">HR Director Review</span>
               </div>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all group"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span>Back to Dashboard</span>
+              </Link>
             </div>
 
             <p className="text-xs text-slate-400">

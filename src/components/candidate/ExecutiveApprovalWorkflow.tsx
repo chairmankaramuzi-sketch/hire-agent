@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   CheckCircle2,
   Clock,
@@ -15,6 +16,7 @@ import {
   Stamp,
   Lock,
   FileText,
+  ArrowLeft,
 } from 'lucide-react';
 import { approvalService } from '@/services/approvalService';
 import { CandidateApprovalState, ApprovalStage } from '@/types/approval';
@@ -310,15 +312,24 @@ export function ExecutiveApprovalWorkflow({
 
       {/* Feedback Banner */}
       {feedback && (
-        <div className="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-900 dark:text-indigo-200 flex items-center gap-2 animate-in fade-in">
-          <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-          <span>{feedback}</span>
+        <div className="p-3.5 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs font-semibold text-indigo-900 dark:text-indigo-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <span>{feedback}</span>
+          </div>
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors shrink-0"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Back to Dashboard</span>
+          </Link>
         </div>
       )}
 
       {/* Instant Contract Generation: Appears when Mr. Kalamuzi grants Final Hiring Authorization */}
       {currentStage === 'EXECUTIVE_AUTHORIZED' && (
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/60 border-2 border-emerald-400 dark:border-emerald-600 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in zoom-in-95 shadow-md">
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/60 border-2 border-emerald-400 dark:border-emerald-600 flex flex-col lg:flex-row items-center justify-between gap-4 animate-in zoom-in-95 shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20">
               <Stamp className="w-5 h-5" />
@@ -338,14 +349,25 @@ export function ExecutiveApprovalWorkflow({
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setOfferModalOpen(true)}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all shrink-0 hover:scale-105"
-          >
-            <FileText className="w-4 h-4" />
-            <span>Generate Official Offer Letter</span>
-          </button>
+          <div className="flex items-center gap-2 w-full lg:w-auto shrink-0">
+            <Link
+              href="/dashboard"
+              className="flex-1 lg:flex-initial px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs"
+              title="Return to Dashboard"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setOfferModalOpen(true)}
+              className="flex-1 lg:flex-initial px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition-all hover:scale-105"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Generate Official Offer Letter</span>
+            </button>
+          </div>
         </div>
       )}
 

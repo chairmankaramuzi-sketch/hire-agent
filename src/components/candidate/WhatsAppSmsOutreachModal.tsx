@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Smartphone,
   Send,
@@ -13,6 +14,7 @@ import {
   Phone,
   Calendar,
   ExternalLink,
+  ArrowLeft,
 } from 'lucide-react';
 import { useBlindScreening } from '@/context/BlindScreeningContext';
 
@@ -216,9 +218,19 @@ export function WhatsAppSmsOutreachModal({
               </div>
 
               {sentFeedback && (
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-[11px] flex items-center gap-2">
-                  <CheckCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Outreach initiated! Candidate response tracked on mobile.</span>
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-800 dark:text-emerald-300 text-[11px] flex flex-col sm:flex-row sm:items-center justify-between gap-2 animate-in fade-in">
+                  <div className="flex items-center gap-2">
+                    <CheckCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Outreach initiated! Candidate response tracked on mobile.</span>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    onClick={onClose}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 shadow-xs transition-colors"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to Dashboard</span>
+                  </Link>
                 </div>
               )}
             </div>

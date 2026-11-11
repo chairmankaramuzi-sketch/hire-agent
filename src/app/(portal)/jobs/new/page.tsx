@@ -137,19 +137,37 @@ export default function NewJobPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 transition-colors">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group shrink-0"
+            title="Return to Executive Dashboard"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
+          <Link
+            href="/jobs"
+            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Back to Jobs List"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Post a New Job</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Enter job details and choose your must-have requirements and scored skills.
+            </p>
+          </div>
+        </div>
         <Link
           href="/jobs"
-          className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors self-start sm:self-auto"
         >
-          <ArrowLeft className="w-5 h-5" />
+          View All Jobs
         </Link>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Post a New Job</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Enter job details and choose your must-have requirements and scored skills.
-          </p>
-        </div>
       </div>
 
       {error && (

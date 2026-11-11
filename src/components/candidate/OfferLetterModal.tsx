@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   X,
   FileText,
@@ -22,6 +23,7 @@ import {
   ExternalLink,
   QrCode,
   Smartphone,
+  ArrowLeft,
 } from 'lucide-react';
 import { offerService } from '@/services/offerService';
 import { OfferPackage } from '@/types/offer';
@@ -184,11 +186,25 @@ export function OfferLetterModal({
 
         {/* Feedback Alert */}
         {feedback && (
-          <div className="px-6 py-2.5 bg-emerald-500 text-white text-xs font-bold flex items-center justify-between animate-in fade-in">
-            <span>{feedback}</span>
-            <button onClick={() => setFeedback(null)} className="opacity-80 hover:opacity-100">
-              ✕
-            </button>
+          <div className="px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold flex flex-col sm:flex-row items-center justify-between gap-2.5 animate-in fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{feedback}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/dashboard"
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white text-emerald-800 font-extrabold text-xs shadow-xs hover:bg-emerald-50 transition-colors"
+                title="Return to Executive Dashboard"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Dashboard</span>
+              </Link>
+              <button onClick={() => setFeedback(null)} className="opacity-80 hover:opacity-100 p-1">
+                ✕
+              </button>
+            </div>
           </div>
         )}
 
@@ -462,6 +478,16 @@ export function OfferLetterModal({
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Link
+              href="/dashboard"
+              onClick={onClose}
+              className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-slate-200 dark:border-slate-700"
+              title="Return to Dashboard"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+
             <button
               type="button"
               onClick={onClose}

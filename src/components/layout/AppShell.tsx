@@ -14,6 +14,7 @@ import {
   X,
   Smartphone,
   Scale,
+  ArrowLeft,
 } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 import { User } from '@/types';
@@ -304,6 +305,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   : 'HIRE~Agent'}
               </span>
             </div>
+
+            {/* Back to Dashboard Button when opened any service */}
+            {pathname !== '/dashboard' && (
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200 dark:border-indigo-800 text-xs font-bold text-indigo-700 dark:text-indigo-300 transition-all shadow-xs group shrink-0 ml-1 sm:ml-2"
+                title="Return to Dashboard"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                <span className="hidden sm:inline">Back to Dashboard</span>
+                <span className="sm:hidden">Dashboard</span>
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">

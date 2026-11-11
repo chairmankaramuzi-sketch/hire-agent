@@ -164,8 +164,18 @@ export default function JobApplicationsPage({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group shrink-0"
+            title="Return to Executive Dashboard"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
+          <Link
             href="/jobs"
             className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title="Back to Jobs List"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>

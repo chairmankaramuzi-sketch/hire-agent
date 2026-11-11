@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   UploadCloud,
   FileText,
@@ -10,6 +11,7 @@ import {
   RefreshCw,
   Sparkles,
   Layers,
+  ArrowLeft,
 } from 'lucide-react';
 import { applicationsService } from '@/services';
 import { Application } from '@/types';
@@ -628,14 +630,24 @@ export function CvUploadPrototypeModal({
             </button>
 
             {results ? (
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-colors flex items-center gap-2"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                View Screened Candidates
-              </button>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  onClick={onClose}
+                  className="px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl transition-colors flex items-center gap-1.5"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Back to Dashboard</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-sm transition-colors flex items-center gap-2"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  View Screened Candidates
+                </button>
+              </div>
             ) : (
               <button
                 type="button"

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, use } from 'react';
+import Link from 'next/link';
 import {
   FileText,
   ShieldCheck,
@@ -19,6 +20,7 @@ import {
   AlertCircle,
   Stamp,
   Lock,
+  ArrowLeft,
 } from 'lucide-react';
 import { offerService } from '@/services/offerService';
 import { OfferPackage } from '@/types/offer';
@@ -177,6 +179,15 @@ export default function CandidateOfferSigningPage({
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group"
+              title="Return to Dashboard"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+              <span className="hidden sm:inline">Back to Dashboard</span>
+              <span className="sm:hidden">Dashboard</span>
+            </Link>
             <button
               onClick={() => window.print()}
               className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
@@ -373,6 +384,15 @@ export default function CandidateOfferSigningPage({
                       {new Date(offer.signedAt || Date.now()).toLocaleDateString()}
                     </p>
                     <p className="text-[10px] font-mono text-slate-400">Verified IP: {offer.signatureIp || '192.168.1.1'}</p>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/dashboard"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-colors"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Back to Dashboard</span>
+                    </Link>
                   </div>
                 </div>
               ) : (

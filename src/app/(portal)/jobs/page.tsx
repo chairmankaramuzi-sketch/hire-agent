@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PlusCircle, Search, Filter, Briefcase, ChevronRight } from 'lucide-react';
+import { PlusCircle, Search, Filter, Briefcase, ChevronRight, ArrowLeft } from 'lucide-react';
 import { jobsService } from '@/services';
 import { Job, JobStatus } from '@/types';
 import { StatusBadge } from '@/components/ui/Badge';
@@ -35,15 +35,25 @@ export default function JobsListPage() {
     <div className="space-y-6 max-w-7xl mx-auto transition-colors">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Job Openings</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Manage your job openings, required qualifications, and candidate scoring rules.
-          </p>
+        <div className="flex items-start sm:items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group shrink-0"
+            title="Return to Executive Dashboard"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Job Openings</h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Manage your job openings, required qualifications, and candidate scoring rules.
+            </p>
+          </div>
         </div>
         <Link
           href="/jobs/new"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm shadow-md shadow-indigo-600/20 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm shadow-md shadow-indigo-600/20 transition-all shrink-0"
         >
           <PlusCircle className="w-4 h-4" />
           Post a New Job

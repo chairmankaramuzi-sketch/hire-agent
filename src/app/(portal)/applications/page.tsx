@@ -24,6 +24,7 @@ import {
   Smartphone,
   FileText,
   Stamp,
+  ArrowLeft,
 } from 'lucide-react';
 import { applicationsService, notificationsService } from '@/services';
 import { Application } from '@/types';
@@ -282,13 +283,23 @@ export default function AllApplicationsPage() {
     <div className="space-y-6 max-w-7xl mx-auto transition-colors relative">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Candidate Applications & Screening
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Review applicant qualifications, compare candidates head-to-head, and manage visual pipeline stages.
-          </p>
+        <div className="flex items-start sm:items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-xs group shrink-0"
+            title="Return to Executive Dashboard"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Candidate Applications & Screening
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Review applicant qualifications, compare candidates head-to-head, and manage visual pipeline stages.
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -358,17 +369,26 @@ export default function AllApplicationsPage() {
 
       {/* Bulk Feedback Banner */}
       {bulkFeedback && (
-        <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 flex items-center justify-between shadow-md animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-md animate-in fade-in">
           <span className="font-semibold flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
             {bulkFeedback}
           </span>
-          <button
-            onClick={() => setBulkFeedback(null)}
-            className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline"
-          >
-            Dismiss
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+            <button
+              onClick={() => setBulkFeedback(null)}
+              className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline px-2 py-1"
+            >
+              Dismiss
+            </button>
+          </div>
         </div>
       )}
 

@@ -33,11 +33,11 @@ export function AiFairnessAuditModal({ isOpen, onClose }: AiFairnessAuditModalPr
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto"
+      className="fixed inset-0 z-50 flex flex-col justify-start sm:justify-center items-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl max-w-2xl w-full my-auto max-h-[94vh] flex flex-col shadow-2xl transition-colors relative overflow-hidden"
+        className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl max-w-2xl w-full my-auto max-h-[90vh] sm:max-h-[85vh] flex flex-col shadow-2xl transition-colors relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Gold/Emerald Enterprise Accent */}

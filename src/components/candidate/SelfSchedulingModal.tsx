@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   Calendar,
   Clock,
@@ -16,6 +17,7 @@ import {
   Send,
   Mail,
   Smartphone,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface SelfSchedulingModalProps {
@@ -362,16 +364,26 @@ export function SelfSchedulingModal({
                       <span>Add to Outlook</span>
                     </a>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSimConfirmed(false);
-                      onClose();
-                    }}
-                    className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold text-xs shadow hover:bg-emerald-700 transition-colors"
-                  >
-                    Done & Return to Candidates
-                  </button>
+                  <div className="flex items-center gap-2 justify-center flex-wrap pt-2">
+                    <Link
+                      href="/dashboard"
+                      onClick={onClose}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs shadow-sm hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Back to Dashboard</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSimConfirmed(false);
+                        onClose();
+                      }}
+                      className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-semibold text-xs hover:bg-slate-300 transition-colors"
+                    >
+                      Done & Return
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-3">
