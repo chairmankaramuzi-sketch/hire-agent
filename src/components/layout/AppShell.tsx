@@ -14,7 +14,6 @@ import {
   X,
   Smartphone,
   Scale,
-  Play,
 } from 'lucide-react';
 import { authService, activeUser } from '@/services/auth';
 import { User } from '@/types';
@@ -26,7 +25,6 @@ import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { ExecutiveLoginNotificationModal } from '@/components/notifications/ExecutiveLoginNotificationModal';
 import { AudiencePhoneTestModal } from '@/components/presentation/AudiencePhoneTestModal';
 import { AiFairnessAuditModal } from '@/components/presentation/AiFairnessAuditModal';
-import { PresentationTourBanner } from '@/components/presentation/PresentationTourBanner';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -374,15 +372,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Responsive Main Page Container */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">{children}</main>
       </div>
-
-      {/* 1-Click Presentation Tour Banner (Demo Story Mode) */}
-      <PresentationTourBanner
-        onOpenPhoneTest={(tab) => {
-          setPhoneTestTab(tab || 'prescreen');
-          setPhoneTestOpen(true);
-        }}
-        onOpenFairnessAudit={() => setFairnessAuditOpen(true)}
-      />
 
       {/* Audience Live Smartphone Test Modal */}
       <AudiencePhoneTestModal
